@@ -1,0 +1,230 @@
+%% KTH Document Template — Example
+%% Based on kth-document.cls, implementing the KTH Graphical Profile (Sept. 2023)
+%%
+%% ---- Compilation -------------------------------------------------------
+%%   pdflatex example.tex      standard, uses TeX Gyre fonts as substitutes
+%%   xelatex  example.tex      exact KTH fonts (Figtree + Georgia) if installed
+%%
+%% ---- Logo --------------------------------------------------------------
+%%   The logo is shown only on the first page (in the title block).
+%%   The class looks for the file set by \kthlogopath in this order:
+%%     .pdf  →  .png  →  .eps
+%%   Default filename: KTH_logo_RGB_bla  (the standard KTH blue logo PNG)
+%%   To use a different file:
+%%     \renewcommand{\kthlogopath}{/path/to/your-logo}   (no extension)
+%%   To adjust logo size:
+%%     \renewcommand{\kthlogoheight}{1.8cm}
+%%
+%% ---- Class options -----------------------------------------------------
+%%   english     — English locale: babel, standard decimal point  [default]
+%%   swedish     — Swedish locale: babel, decimal comma via icomma
+%%   titlepage   — full separate title page instead of inline title block
+%%   12pt, etc.  — any article class option is passed through
+%%
+%% ---- Metadata commands -------------------------------------------------
+%%   \title{...}        document title                           (required)
+%%   \subtitle{...}     subtitle line below the title           (optional)
+%%   \doctype{...}      document type label, e.g. "Activity Report"
+%%   \author{...}       author name(s)
+%%   \affiliation{...}  department / school, shown next to author
+%%   \date{...}         date; use \today or a fixed string
+%%   \version{...}      version string, shown as "(vX.Y)" after date
+%%   \shorttitle{...}   short title shown in header on pages 2+
+%%
+%% ---- KTH colors --------------------------------------------------------
+%%   All colors from the KTH Grafisk manual (v1.2, 2024) are defined and
+%%   can be used anywhere with \textcolor{name}{...} or \colorbox{name}{...}.
+%%
+%%   Primary palette:
+%%     kthwhite        #FFFFFF
+%%     kthsand         #EBE5E0   warm grey
+%%     kthblue         #004791   KTH brand blue — headings, rules, links
+%%     kthskyblue      #6298D2
+%%     kthnavy         #000061   navy — logo wreath color
+%%     kthlightblue    #DEF0FF   tint (used for kthbox background)
+%%     kthdigitalblue  #0029ED   screen only; use kthblue for print
+%%
+%%   Functional palette — for diagrams, charts, reports.
+%%   Each color family has three variants: dark / mid / light.
+%%   Naming: kth{dark,<empty>,light}{family}
+%%
+%%     family    dark (#)    mid (#)     light (#)
+%%     green     0D4A21      4DA060      C7EBBA
+%%     teal      1C434C      339C9C      B2E0E0
+%%     brick     78001A      E86A58      FFCCC4
+%%     yellow    A65900      FFBE00      FFF0B0
+%%     gray      323232      A5A5A5      E6E6E6   (grey spellings also work)
+%%
+%%   Web-only text colors: kthbrokenblack (#212121), kthbrokenwhite (#FCFCFC)
+%%   Aliases: kthaccent = kthblue,  kthmuted = kthsand
+%%
+%% ---- Callout boxes -----------------------------------------------------
+%%   \begin{kthbox}...\end{kthbox}
+%%       Light-blue highlighted box — use for summaries, key points, notices.
+%%   \begin{kthnotebox}...\end{kthnotebox}
+%%       Sand-colored box — use for notes, caveats, supplementary info.
+%%
+%% ---- Inline helpers ----------------------------------------------------
+%%   \kthhl{text}      bold + KTH blue — highlight a keyword inline
+%%
+%% ---- Adding packages ---------------------------------------------------
+%%   Add \usepackage{...} in the preamble below as usual.
+%%   The class loads: geometry, xcolor, graphicx, hyperref, fancyhdr,
+%%   titlesec, parskip, mdframed, babel, csquotes, iftex, microtype (pdftex).
+%%   Safe to add: amsmath, amssymb, booktabs, biblatex, siunitx, tikz, etc.
+
+\documentclass[english,11pt]{kth-document}
+
+% ---- Optional: adjust logo path ----
+% \renewcommand{\kthlogopath}{/path/to/kth-logo}
+
+% ---- Metadata ----
+\title{Project Title}
+\subtitle{A short, informative subtitle}
+\doctype{Activity Report}          % e.g. Project Description, Report, Memo
+\author{Firstname Lastname}
+\affiliation{School of Engineering Sciences (SCI), KTH}
+\date{\today}
+\version{1.0}                      % optional; omit to hide version
+\shorttitle{Project Title}         % appears in header on pages 2+
+
+% ---- Add packages as needed ----
+% \usepackage{amsmath, amssymb}    % math
+% \usepackage{booktabs}            % nice tables
+% \usepackage{biblatex}            % bibliography
+
+% Colored swatch box used in the color reference section below
+\newcommand{\swatch}[1]{%
+  {\setlength{\fboxsep}{0pt}\setlength{\fboxrule}{0.4pt}%
+   \fbox{\colorbox{#1}{\rule{0pt}{0.9em}\hspace{2.2em}}}}%
+}
+
+\begin{document}
+
+\maketitle
+
+% ---- Optional abstract / summary box ----
+\begin{kthbox}
+  \textbf{Summary.}
+  A brief summary of the document goes here. This highlighted box uses the
+  KTH light blue and is useful for abstracts, key findings, or important notices. 
+\end{kthbox}
+
+
+\section{Background}
+
+This document is an example of the \textbf{kth-document} LaTeX class, which
+implements the KTH Graphical Profile (updated September 2023). It provides a
+clean, professional look suitable for activity reports, project descriptions,
+internal memos, and similar documents.
+
+The class is built on the standard \texttt{article} class and stays out of the
+way of additional packages you may need.
+
+
+\section{Objectives}
+
+\subsection{Primary goals}
+
+Write a short description of the main objectives. Use bullet lists where
+appropriate:
+
+\begin{itemize}
+  \item First objective — concise and specific.
+  \item Second objective — with measurable outcomes.
+  \item Third objective — connecting to broader context.
+\end{itemize}
+
+\subsection{Secondary goals}
+
+Additional or supporting goals can go here. The \kthhl{highlighted keyword}
+command draws attention to key terms without being distracting.
+
+
+\section{Activities and Timeline}
+
+\begin{center}
+\begin{tabular}{llp{8cm}}
+  \hline
+  \textbf{Phase} & \textbf{Period} & \textbf{Description} \\
+  \hline
+  Planning   & Jan–Feb 2026 & Requirements gathering and stakeholder alignment. \\
+  Execution  & Mar–May 2026 & Core implementation and iterative testing. \\
+  Evaluation & Jun 2026     & Assessment against success criteria. \\
+  \hline
+\end{tabular}
+\end{center}
+
+
+\section{Results}
+
+Describe outcomes, findings, or deliverables here.
+
+\begin{kthnotebox}
+  \textbf{Note.}
+  The sand-colored box (\texttt{kthnotebox}) is useful for notes,
+  caveats, or supplementary information.
+\end{kthnotebox}
+
+
+\section{Conclusions}
+
+Summarize key takeaways and any next steps or recommendations.
+
+
+\section{KTH Color Palette}
+
+All colors from the KTH Grafisk manual (v1.2, 2024) are available as named
+colors. Use them with \verb|\textcolor{name}{...}|, \verb|\colorbox{name}{...}|,
+or anywhere \textsf{xcolor} accepts a color name.
+
+\medskip
+\textbf{Primary palette}
+
+\smallskip
+\begin{tabular}{@{}llll@{}}
+  \swatch{kthblue}        & \texttt{kthblue}        & \texttt{\#004791} & KTH brand blue — headings, rules, links \\[4pt]
+  \swatch{kthskyblue}     & \texttt{kthskyblue}     & \texttt{\#6298D2} & Sky blue \\[4pt]
+  \swatch{kthnavy}        & \texttt{kthnavy}        & \texttt{\#000061} & Navy — logo wreath \\[4pt]
+  \swatch{kthlightblue}   & \texttt{kthlightblue}   & \texttt{\#DEF0FF} & Light blue tint (\texttt{kthbox} background) \\[4pt]
+  \swatch{kthsand}        & \texttt{kthsand}        & \texttt{\#EBE5E0} & Sand / warm grey (\texttt{kthnotebox} background) \\[4pt]
+  \swatch{kthwhite}       & \texttt{kthwhite}       & \texttt{\#FFFFFF} & White \\[4pt]
+  \swatch{kthdigitalblue} & \texttt{kthdigitalblue} & \texttt{\#0029ED} & Digital blue — \emph{screen only, not for print} \\
+\end{tabular}
+
+\medskip
+\textbf{Functional palette} — for diagrams, charts, and reports.
+Each family has dark, mid, and light variants named
+\texttt{kth\{dark,\textnormal{<empty>},light\}\{family\}},
+e.g.\ \texttt{kthdarkgreen}, \texttt{kthgreen}, \texttt{kthlightgreen}.
+Grey spellings (\texttt{kth{*}grey}) are also accepted.
+
+\smallskip
+\begin{tabular}{@{}lcccp{8cm}@{}}
+  \textit{Family} & \textit{dark} & \textit{mid} & \textit{light} & \\[4pt]
+  green  & \swatch{kthdarkgreen}  & \swatch{kthgreen}  & \swatch{kthlightgreen}
+         & \texttt{\#0D4A21 / \#4DA060 / \#C7EBBA} \\[4pt]
+  teal   & \swatch{kthdarkteal}   & \swatch{kthteal}   & \swatch{kthlightteal}
+         & \texttt{\#1C434C / \#339C9C / \#B2E0E0} \\[4pt]
+  brick  & \swatch{kthdarkbrick}  & \swatch{kthbrick}  & \swatch{kthlightbrick}
+         & \texttt{\#78001A / \#E86A58 / \#FFCCC4} \\[4pt]
+  yellow & \swatch{kthdarkyellow} & \swatch{kthyellow} & \swatch{kthlightyellow}
+         & \texttt{\#A65900 / \#FFBE00 / \#FFF0B0} \\[4pt]
+  gray   & \swatch{kthdarkgray}   & \swatch{kthgray}   & \swatch{kthlightgray}
+         & \texttt{\#323232 / \#A5A5A5 / \#E6E6E6} \\
+\end{tabular}
+
+\begin{kthnotebox}
+  \textbf{Web-only text colors.}
+  \texttt{kthbrokenblack} (\texttt{\#212121}) and \texttt{kthbrokenwhite}
+  (\texttt{\#FCFCFC}) are intended for body text on screen to improve
+  readability. Do not use them for decorative elements or print.
+\end{kthnotebox}
+
+
+\section{Contact}
+
+For questions about this document, contact
+\href{mailto:name@kth.se}{name@kth.se}.
+
+\end{document}
