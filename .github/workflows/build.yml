@@ -41,6 +41,14 @@ jobs:
       - name: Install md-to-pdf
         run: npm install -g md-to-pdf
 
+      # Ubuntu 24.04 (ubuntu-latest) restricts unprivileged user namespaces
+      # via AppArmor, which breaks Puppeteer's bundled Chromium sandbox.
+      # Relax the restriction so Chromium can launch without --no-sandbox
+      # (which would otherwise have to be threaded through every md-to-pdf
+      # invocation, including the consumer-example Makefile).
+      - name: Allow Chromium unprivileged user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
       # --------------------------------------------------------------- #
       # Build the in-repo example (showcases every styled element)      #
       # --------------------------------------------------------------- #
