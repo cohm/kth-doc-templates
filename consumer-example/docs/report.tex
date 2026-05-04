@@ -1,0 +1,79 @@
+%% Consumer-example — same content as report.md, rendered via LaTeX.
+%% The Makefile sets TEXINPUTS=.:.templates: so \documentclass finds
+%% kth-document.cls and \kthlogopath finds KTH_logo_RGB_bla.png in the
+%% submodule without any path prefix in the .tex source.
+
+\documentclass[english,11pt]{kth-document}
+
+\title{Widget Library v2 --- User Guide}
+\subtitle{Installing, using, and extending the widget library}
+\doctype{Package documentation}
+\author{Maintainers}
+\affiliation{KTH Royal Institute of Technology}
+\date{\today}
+\version{2.0}
+\shorttitle{Widget Library v2}
+
+\begin{document}
+\maketitle
+
+\begin{kthbox}
+\textbf{Summary.} This document describes how to install and use the
+widget library in downstream projects. It is built from \texttt{report.tex}
+using the \href{https://github.com/kth/kth-doc-templates}{kth-doc-templates}
+LaTeX class, included here as a git submodule under \texttt{.templates/}.
+\end{kthbox}
+
+\section{Installation}
+
+Add the package to your project:
+
+\begin{verbatim}
+npm install @kth/widget-library
+\end{verbatim}
+
+\section{Quick start}
+
+Import the main entry point and instantiate a widget:
+
+\begin{verbatim}
+import { Widget } from '@kth/widget-library';
+
+const w = new Widget({ kind: 'gauge' });
+w.render('#root');
+\end{verbatim}
+
+\section{API reference}
+
+\subsection{\texttt{new Widget(options)}}
+
+Creates a new widget instance.
+
+\begin{center}
+\begin{tabular}{llll}
+  \hline
+  \textbf{Option} & \textbf{Type} & \textbf{Default} & \textbf{Description} \\
+  \hline
+  \texttt{kind}  & string & \texttt{'bar'} & Widget type --- bar, gauge, \ldots \\
+  \texttt{theme} & string & \texttt{'kth'} & Visual theme. \\
+  \texttt{data}  & array  & \texttt{[]}    & Initial dataset. \\
+  \hline
+\end{tabular}
+\end{center}
+
+\subsection{\texttt{widget.render(selector)}}
+
+Mounts the widget into the DOM element matched by \texttt{selector}.
+
+\begin{kthnotebox}
+\textbf{Note.} The widget mounts synchronously and assumes the target
+element already exists. Wait for \texttt{DOMContentLoaded} if you call
+this from a top-level script.
+\end{kthnotebox}
+
+\section{Contact}
+
+For support, contact the package maintainers at
+\href{mailto:widget-library@kth.se}{widget-library@kth.se}.
+
+\end{document}

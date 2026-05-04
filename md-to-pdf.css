@@ -1,0 +1,258 @@
+/* KTH Markdown-to-PDF stylesheet
+ * Mirrors kth-document.cls — implements the KTH Graphical Profile
+ * (Grafisk manual v1.2, 2024) for Markdown documents rendered via md-to-pdf.
+ *
+ * Fonts:    Figtree (headings, from Google Fonts) + Georgia (body)
+ * Palette:  KTH primary + functional colours (CSS custom properties below)
+ * Logo:     place ![](KTH_logo_RGB_bla.png) as the FIRST line of your .md
+ *           — it will be sized to 2cm tall like the LaTeX title block.
+ *
+ * Custom classes (use inline HTML in your markdown):
+ *   <span class="kthhl">word</span>           bold + KTH blue
+ *   <div class="notebox">…</div>              sand-coloured note box
+ *   <p class="subtitle">…</p>                 subtitle below H1
+ *   <p class="doctype">…</p>                  document-type label
+ * Blockquotes (`> …`) automatically render as the light-blue "kthbox".
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Primary palette */
+  --kth-white:        #FFFFFF;
+  --kth-sand:         #EBE5E0;
+  --kth-blue:         #004791;
+  --kth-skyblue:      #6298D2;
+  --kth-navy:         #000061;
+  --kth-lightblue:    #DEF0FF;
+  --kth-digitalblue:  #0029ED;
+  --kth-brokenblack:  #212121;
+  --kth-brokenwhite:  #FCFCFC;
+
+  /* Functional palette — dark / mid / light */
+  --kth-green-dark:   #0D4A21;  --kth-green:   #4DA060;  --kth-green-light:   #C7EBBA;
+  --kth-teal-dark:    #1C434C;  --kth-teal:    #339C9C;  --kth-teal-light:    #B2E0E0;
+  --kth-brick-dark:   #78001A;  --kth-brick:   #E86A58;  --kth-brick-light:   #FFCCC4;
+  --kth-yellow-dark:  #A65900;  --kth-yellow:  #FFBE00;  --kth-yellow-light:  #FFF0B0;
+  --kth-gray-dark:    #323232;  --kth-gray:    #A5A5A5;  --kth-gray-light:    #E6E6E6;
+
+  /* Aliases */
+  --kth-accent: var(--kth-blue);
+  --kth-muted:  var(--kth-sand);
+
+  --heading-font: 'Figtree', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --body-font:    Georgia, 'Times New Roman', serif;
+  --mono-font:    'SF Mono', Menlo, Monaco, Consolas, monospace;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Body                                                                      */
+/* ------------------------------------------------------------------------- */
+body.kth-document {
+  font-family: var(--body-font);
+  font-size: 11pt;
+  line-height: 1.55;
+  color: var(--kth-brokenblack);
+  margin: 0;
+}
+
+p { margin: 0 0 0.6em 0; }
+
+/* First page — suppress the running header (matches \thispagestyle{empty}
+ * in the LaTeX class) by crushing the top margin so the headerTemplate is
+ * clipped off the page, and bringing the logo close to the page edge. */
+@page :first {
+  margin-top: 20mm;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Headings — proportional to body size, KTH blue, Figtree                   */
+/* ------------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--heading-font);
+  font-weight: 600;
+  color: var(--kth-blue);
+  line-height: 1.2;
+  margin: 1.4em 0 0.4em;
+}
+
+/* H1 — document title (cls: \maketitle inline title block, 1.65× base) */
+h1 {
+  font-size: 1.65em;     /* ~18pt at 11pt body */
+  margin-top: 0.2em;
+  padding-bottom: 0.25em;
+  border-bottom: 1.8pt solid var(--kth-blue);
+}
+
+/* H2 — section (cls: \section, 1.25× base, blue rule under) */
+h2 {
+  font-size: 1.25em;     /* ~14pt */
+  margin-top: 1.6em;
+  padding-bottom: 2pt;
+  border-bottom: 0.5pt solid color-mix(in srgb, var(--kth-blue) 40%, transparent);
+}
+
+/* H3 — subsection (cls: \subsection, 1.10×, slightly muted blue) */
+h3 {
+  font-size: 1.10em;     /* ~12pt */
+  color: color-mix(in srgb, var(--kth-blue) 85%, black);
+}
+
+/* H4 — subsubsection (cls: italic, dark gray, normal size) */
+h4 {
+  font-size: 1em;
+  font-weight: 400;
+  font-style: italic;
+  color: color-mix(in srgb, black 70%, transparent);
+}
+
+h5, h6 {
+  font-size: 0.95em;
+  font-weight: 600;
+  color: var(--kth-gray-dark);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Title block — first H1 + optional subtitle/doctype paragraphs             */
+/* ------------------------------------------------------------------------- */
+p.subtitle {
+  font-family: var(--heading-font);
+  font-size: 1.15em;
+  color: color-mix(in srgb, var(--kth-blue) 75%, white);
+  margin: -0.4em 0 0.2em;
+}
+
+p.doctype {
+  font-family: var(--heading-font);
+  font-size: 0.9em;
+  color: color-mix(in srgb, black 55%, transparent);
+  margin: 0 0 0.6em;
+}
+
+/* Logo: first child paragraph containing only an image is treated as
+ * the title-block logo and sized to match \kthlogoheight (2cm). */
+body.kth-document > p:first-child > img:only-child {
+  height: 2cm;
+  width: auto;
+  margin: 0 0 0.4cm 0;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Links                                                                     */
+/* ------------------------------------------------------------------------- */
+a, a:visited {
+  color: var(--kth-blue);
+  text-decoration: none;
+  border-bottom: 0.5pt solid color-mix(in srgb, var(--kth-blue) 40%, transparent);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Blockquote — rendered as the kthbox (light-blue highlighted box)          */
+/* ------------------------------------------------------------------------- */
+blockquote {
+  background: var(--kth-lightblue);
+  border: 1pt solid var(--kth-blue);
+  border-left-width: 1pt;     /* full border, like \newmdenv kthbox */
+  padding: 0.6em 0.9em;
+  margin: 1em 0;
+  color: var(--kth-brokenblack);
+}
+blockquote > :first-child { margin-top: 0; }
+blockquote > :last-child  { margin-bottom: 0; }
+
+/* Note box — kthnotebox equivalent */
+.notebox {
+  background: var(--kth-sand);
+  border: 0.8pt solid color-mix(in srgb, var(--kth-blue) 30%, transparent);
+  padding: 0.6em 0.9em;
+  margin: 1em 0;
+}
+.notebox > :first-child { margin-top: 0; }
+.notebox > :last-child  { margin-bottom: 0; }
+
+/* Inline keyword highlight — \kthhl */
+.kthhl {
+  font-weight: 700;
+  color: var(--kth-blue);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Lists                                                                     */
+/* ------------------------------------------------------------------------- */
+ul, ol { padding-left: 1.4em; margin: 0.4em 0 0.8em; }
+li { margin: 0.15em 0; }
+ul li::marker { color: var(--kth-blue); }
+
+/* ------------------------------------------------------------------------- */
+/* Code                                                                      */
+/* ------------------------------------------------------------------------- */
+code, pre {
+  font-family: var(--mono-font);
+  font-size: 0.9em;
+}
+code {
+  background: var(--kth-gray-light);
+  padding: 1pt 4pt;
+  border-radius: 2pt;
+}
+pre {
+  background: var(--kth-sand);
+  border-left: 2pt solid var(--kth-blue);
+  padding: 0.6em 0.9em;
+  overflow-x: auto;
+  line-height: 1.4;
+}
+pre > code {
+  background: transparent;
+  padding: 0;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Tables                                                                    */
+/* ------------------------------------------------------------------------- */
+table {
+  border-collapse: collapse;
+  margin: 0.8em 0;
+  font-size: 0.95em;
+}
+th, td {
+  padding: 4pt 8pt;
+  text-align: left;
+  vertical-align: top;
+}
+thead th {
+  font-family: var(--heading-font);
+  font-weight: 600;
+  color: var(--kth-blue);
+  border-bottom: 1pt solid var(--kth-blue);
+}
+tbody tr {
+  border-bottom: 0.4pt solid var(--kth-gray-light);
+}
+tbody tr:last-child {
+  border-bottom: 0.4pt solid var(--kth-gray);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Horizontal rule                                                           */
+/* ------------------------------------------------------------------------- */
+hr {
+  border: 0;
+  border-top: 0.6pt solid color-mix(in srgb, var(--kth-blue) 50%, transparent);
+  margin: 1.2em 0;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Images                                                                    */
+/* ------------------------------------------------------------------------- */
+img { max-width: 100%; height: auto; }
+figure { margin: 1em 0; }
+figcaption {
+  font-size: 0.9em;
+  color: color-mix(in srgb, black 60%, transparent);
+  font-style: italic;
+  margin-top: 0.3em;
+}
+
+/* Page break helper for "\newpage" equivalents */
+.page-break { page-break-after: always; }

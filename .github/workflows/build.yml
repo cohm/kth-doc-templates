@@ -1,0 +1,113 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'docs/preview/**'
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # --------------------------------------------------------------- #
+      # System dependencies                                              #
+      # --------------------------------------------------------------- #
+      - name: Install TeX Live + poppler-utils
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-fonts-extra \
+            tex-gyre \
+            poppler-utils
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install md-to-pdf
+        run: npm install -g md-to-pdf
+
+      # Ubuntu 24.04 (ubuntu-latest) restricts unprivileged user namespaces
+      # via AppArmor, which breaks Puppeteer's bundled Chromium sandbox.
+      # Relax the restriction so Chromium can launch without --no-sandbox
+      # (which would otherwise have to be threaded through every md-to-pdf
+      # invocation, including the consumer-example Makefile).
+      - name: Allow Chromium unprivileged user namespaces
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      # --------------------------------------------------------------- #
+      # Build the in-repo example (showcases every styled element)      #
+      # --------------------------------------------------------------- #
+      - name: Build example.tex (pdflatex)
+        run: |
+          pdflatex -interaction=nonstopmode -halt-on-error -jobname=example-tex example.tex
+          pdflatex -interaction=nonstopmode -halt-on-error -jobname=example-tex example.tex
+
+      - name: Build example.md (md-to-pdf)
+        run: |
+          md-to-pdf example.md \
+            --config-file md-to-pdf.json \
+            --document-title "Project Title"
+          mv example.pdf example-md.pdf
+
+      # --------------------------------------------------------------- #
+      # Smoke-test the consumer-example layout                           #
+      # (the .templates symlink stands in for a real submodule)          #
+      # --------------------------------------------------------------- #
+      - name: Build consumer-example
+        run: make -C consumer-example/docs
+
+      # --------------------------------------------------------------- #
+      # Render first-page PNG previews for the README                    #
+      # --------------------------------------------------------------- #
+      - name: Render preview PNGs
+        run: |
+          mkdir -p docs/preview
+          pdftoppm -png -r 150 -f 1 -l 1 example-tex.pdf docs/preview/example-tex
+          pdftoppm -png -r 150 -f 1 -l 1 example-md.pdf  docs/preview/example-md
+          mv docs/preview/example-tex-1.png docs/preview/example-tex.png
+          mv docs/preview/example-md-1.png  docs/preview/example-md.png
+
+      # --------------------------------------------------------------- #
+      # Always upload the PDFs so reviewers can grab them from a PR run  #
+      # --------------------------------------------------------------- #
+      - name: Upload PDFs and previews
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: |
+            example-tex.pdf
+            example-md.pdf
+            consumer-example/docs/*.pdf
+            docs/preview/*.png
+
+      # --------------------------------------------------------------- #
+      # On push to main, commit refreshed previews back to the repo so   #
+      # the README references stay current.                              #
+      # --------------------------------------------------------------- #
+      - name: Commit refreshed previews
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/preview/
+          if git diff --cached --quiet; then
+            echo "No preview changes to commit."
+          else
+            git commit -m "Auto-update preview images [skip ci]"
+            git push
+          fi
