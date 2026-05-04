@@ -26,11 +26,12 @@ jobs:
       - name: Install TeX Live + poppler-utils
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          sudo apt-get install -y \
             texlive-latex-recommended \
             texlive-latex-extra \
             texlive-fonts-recommended \
             texlive-fonts-extra \
+            tex-gyre \
             poppler-utils
 
       - uses: actions/setup-node@v4
