@@ -35,7 +35,7 @@ from each CI run are available as workflow artefacts.
 \subtitle{An optional subtitle}
 \doctype{Activity Report}
 \author{Firstname Lastname}
-\affiliation{School of EECS, KTH}
+\affiliation{School of Engineering Sciences (SCI), KTH}
 \date{\today}
 \version{1.0}          % optional
 \shorttitle{My Doc}    % shown in header on pages 2+
