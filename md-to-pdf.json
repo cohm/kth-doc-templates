@@ -1,0 +1,21 @@
+{
+  "stylesheet": "md-to-pdf.css",
+  "body_class": "kth-document",
+  "marked_options": {
+    "headerIds": true,
+    "smartypants": true
+  },
+  "pdf_options": {
+    "format": "A4",
+    "margin": {
+      "top": "30mm",
+      "bottom": "22mm",
+      "left": "28mm",
+      "right": "28mm"
+    },
+    "printBackground": true,
+    "displayHeaderFooter": true,
+    "headerTemplate": "<div style=\"font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 9pt; color: #004791; width: 100%; padding: 0 28mm; box-sizing: border-box; -webkit-print-color-adjust: exact;\"><div style=\"opacity: 0.75;\"><span class=\"title\"></span></div><div style=\"border-bottom: 1.2pt solid #004791; margin-top: 4px;\"></div></div>",
+    "footerTemplate": "<div style=\"font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 9pt; color: #777; width: 100%; text-align: center;\"><span class=\"pageNumber\"></span></div>"
+  }
+}
