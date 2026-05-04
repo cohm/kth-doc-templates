@@ -85,14 +85,15 @@ jobs:
       # --------------------------------------------------------------- #
       # Always upload the PDFs so reviewers can grab them from a PR run  #
       # --------------------------------------------------------------- #
-      - name: Upload PDFs
+      - name: Upload PDFs and previews
         uses: actions/upload-artifact@v4
         with:
-          name: pdfs
+          name: docs
           path: |
             example-tex.pdf
             example-md.pdf
             consumer-example/docs/*.pdf
+            docs/preview/*.png
 
       # --------------------------------------------------------------- #
       # On push to main, commit refreshed previews back to the repo so   #
