@@ -1,19 +1,32 @@
-# kth-document — KTH LaTeX Document Template
+# kth-document — KTH Document Templates
 
-A clean LaTeX document class for professional KTH documents — activity reports,
-project descriptions, memos, and similar. Implements the
+Professional KTH document templates for **LaTeX** and **Markdown**, both
+implementing the
 [KTH Graphical Profile](https://intra.kth.se/administration/kommunikation/varumarke/grafiskprofil)
-(Grafisk manual v1.2, 2024).
+(Grafisk manual v1.2, 2024). Use them for project descriptions, 
+memos, as a git submodule for package documentation, etc.
+
+## Previews
+
+| LaTeX (`example.tex` → pdflatex) | Markdown (`example.md` → md-to-pdf) |
+|----------------------------------|--------------------------------------|
+| ![](docs/preview/example-tex.png) | ![](docs/preview/example-md.png) |
+
+The previews above are regenerated automatically by CI on every push to
+`main`, so they always reflect the current state of the templates. PDFs
+from each CI run are available as workflow artefacts.
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `kth-document.cls` | The document class — copy this (and the logo) into your project |
-| `example.tex` | Fully annotated example / starting point |
-| `KTH_logo_RGB_bla.png` | KTH logo (blue, PNG) — place next to your `.tex` file |
+| `kth-document.cls` | The LaTeX document class — copy this (and the logo) into your project |
+| `md-to-pdf.{json,css}` | Markdown theme for [md-to-pdf](https://github.com/simonhaenisch/md-to-pdf) |
+| `example.tex`, `example.md` | Fully annotated examples / starting points |
+| `KTH_logo_RGB_bla.png` | KTH logo (blue, PNG) — place next to your source file |
+| `consumer-example/` | Recommended layout for using this repo as a git submodule |
 
-## Quick start
+## Quick start (LaTeX)
 
 ```latex
 \documentclass[english, 11pt]{kth-document}
@@ -34,6 +47,48 @@ project descriptions, memos, and similar. Implements the
 ```
 
 Compile with `pdflatex` (recommended) or `lualatex`/`xelatex` for exact KTH fonts.
+
+## Quick start (Markdown)
+
+[md-to-pdf](https://github.com/simonhaenisch/md-to-pdf) is an npm package
+that wraps Puppeteer (headless Chromium). Install it once globally:
+
+```bash
+npm install -g md-to-pdf
+```
+
+The first install also downloads a Chromium build (~150 MB) for Puppeteer.
+Then build a document:
+
+```bash
+md-to-pdf report.md \
+  --config-file md-to-pdf.json \
+  --document-title "My Document"
+```
+
+Place `![](KTH_logo_RGB_bla.png)` as the first line of your `.md` to use the
+KTH logo as the title-block image. Use `<p class="subtitle">…</p>` and
+`<p class="doctype">…</p>` for the metadata lines below the title, and
+`<div class="notebox">…</div>` / `<span class="kthhl">…</span>` for the
+sand-coloured note boxes and inline keyword highlights. Plain blockquotes
+(`> …`) render as the light-blue summary boxes.
+
+## Use as a git submodule
+
+The recommended pattern for downstream packages is to add this repo as a
+submodule under your `docs/` directory:
+
+```bash
+cd your-package
+git submodule add https://github.com/kth/kth-doc-templates docs/.templates
+cp docs/.templates/consumer-example/docs/Makefile docs/Makefile
+```
+
+Then write `docs/report.md` or `docs/report.tex` and run `make` from `docs/`.
+The Makefile sets `TEXINPUTS=.:.templates:` for pdflatex (so
+`\documentclass{kth-document}` resolves with no path prefix) and points
+md-to-pdf at the submodule's config and stylesheet. See
+[`consumer-example/`](consumer-example/) for the full layout.
 
 ## Class options
 
