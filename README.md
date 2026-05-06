@@ -8,7 +8,7 @@ memos, as a git submodule for package documentation, etc.
 
 ## Previews
 
-| LaTeX (`example.tex` → pdflatex) | Markdown (`example.md` → md-to-pdf) |
+| LaTeX (`example.tex` → lualatex) | Markdown (`example.md` → md-to-pdf) |
 |----------------------------------|--------------------------------------|
 | ![](docs/preview/example-tex.png) | ![](docs/preview/example-md.png) |
 
@@ -46,7 +46,7 @@ from each CI run are available as workflow artefacts.
 \end{document}
 ```
 
-Compile with `pdflatex` (recommended) or `lualatex`/`xelatex` for exact KTH fonts.
+Compile with `pdflatex` or `lualatex`/`xelatex` for exact KTH fonts. CI uses `lualatex` for the generated preview image.
 
 ## Quick start (Markdown)
 
