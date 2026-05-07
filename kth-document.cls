@@ -86,7 +86,7 @@
   \IfFontExistsTF{Figtree}{
     \newfontfamily\headingfont{Figtree}[
       Renderer     = HarfBuzz,
-      RawFeature   = {axis={wght:400}},           % upright weight
+      RawFeature   = {axis={wght:400}},           % Regular weight (400)
       BoldFont     = Figtree,
       BoldFeatures = {RawFeature={axis={wght:600}}} % SemiBold for \bfseries
     ]
