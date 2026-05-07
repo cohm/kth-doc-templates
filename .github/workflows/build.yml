@@ -26,14 +26,20 @@ jobs:
       - name: Install TeX Live + poppler-utils
         run: |
           sudo apt-get update
-          sudo apt-get install -y \
+          sudo apt-get install -y --no-install-recommends \
             texlive-latex-recommended \
             texlive-latex-extra \
             texlive-luatex \
             texlive-fonts-recommended \
-            texlive-fonts-extra \
-            tex-gyre \
             poppler-utils
+      
+      - name: Install Figtree font for LuaLaTeX
+        run: |
+          sudo mkdir -p /usr/local/share/fonts/truetype/figtree
+          sudo curl -fsSL \
+            https://raw.githubusercontent.com/google/fonts/main/ofl/figtree/Figtree%5Bwght%5D.ttf \
+            -o /usr/local/share/fonts/truetype/figtree/Figtree-VariableFont_wght.ttf
+          sudo fc-cache -f
 
       - uses: actions/setup-node@v4
         with:
