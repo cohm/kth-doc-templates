@@ -4,19 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-KTH document templates for two toolchains, sharing the same KTH Graphical
+KTH document templates for three toolchains, sharing the same KTH Graphical
 Profile (Grafisk manual v1.2, 2024):
 
 - **LaTeX** — `kth-document.cls` + `example.tex`. Compile with pdflatex / xelatex / lualatex.
 - **Markdown** — `md-to-pdf.{json,css}` + `example.md`. Render with [md-to-pdf](https://github.com/simonhaenisch/md-to-pdf) (Puppeteer-backed).
+- **Slides** — `reveal/kth-reveal.css` + `reveal/example.html`. Open directly in a browser; reveal.js loads from CDN. Print-PDF via `?print-pdf` query.
 
-Both flows are kept visually aligned: same palette, same Figtree-headings /
-Georgia-body fonts, same heading hierarchy and metadata block, so a `.tex`
-and a `.md` rendering of the same content look like siblings.
+All three flows are kept visually aligned: same palette, same Figtree-headings /
+Georgia-body fonts, same heading hierarchy and metadata block, so the
+rendered outputs of the same content look like siblings.
 
-`example.tex` and `example.md` are both the user-facing manual *and* the
-smoke test. `consumer-example/` shows the recommended layout for downstream
-packages that include this repo as a git submodule.
+`example.tex`, `example.md`, and `reveal/example.html` are all both the
+user-facing manual *and* the smoke test. `consumer-example/` shows the
+recommended layout for downstream packages that include this repo as a git
+submodule.
 
 ## Build
 
@@ -28,6 +30,11 @@ xelatex  example.tex     # exact KTH fonts via fontspec
 
 # Markdown
 md-to-pdf example.md --config-file md-to-pdf.json --document-title "Project Title"
+
+# Slides
+open reveal/example.html                                       # live preview
+node reveal/build-preview.mjs                                  # → docs/preview/example-reveal.png + example-reveal.pdf
+                                                               # (needs `npm install --no-save puppeteer`)
 
 # Consumer example (exercises the submodule pattern via a .templates symlink)
 make -C consumer-example/docs
@@ -124,6 +131,64 @@ When changing the `md-to-pdf.json`'s `headerTemplate` / `footerTemplate`,
 remember Chromium runs them in a stripped context: only inline CSS works,
 font sizes don't inherit, and there's no API to detect first page (hence
 the `@page :first` margin trick).
+
+## Reveal.js slide theme (`reveal/`)
+
+`reveal/kth-reveal.css` is the third toolchain — it mirrors the *same* KTH
+custom properties as `md-to-pdf.css` (`--kth-blue`, `--kth-yellow`,
+`--kth-sand`, …) so the palette is a single conceptual source of truth
+across all three flows. Heading sizes use the same 1.65× / 1.25× / 1.10× /
+1.0× ratios.
+
+A few things to know before editing:
+
+- **CDN over npm.** `example.html` loads `reveal.js@5.x` from jsDelivr,
+  Figtree from Google Fonts. Zero install — `open reveal/example.html`
+  works for users who clone the repo. We deliberately avoid a `package.json`
+  in the repo root to keep the onboarding story flat. `puppeteer` is only
+  pulled in transiently by the CI preview script (`build-preview.mjs`).
+
+- **Cover / divider / closing layout.** These three slide types are flagged
+  by `data-state` on the `<section>`. The CSS uses **`padding-top` to push
+  content down**, not flex or absolute positioning, because reveal's
+  print-pdf stylesheet (`html.reveal-print .reveal .slides section`) sets
+  `padding: 0 !important; min-height: 1px;` and would override either of
+  those. We re-apply the layout under that selector with matching
+  specificity — see the `print-pdf` block at the bottom of `kth-reveal.css`.
+
+- **Slide-background gradients.** Reveal does *not* mirror `data-state` from
+  the `<section>` to the `.slide-background` it generates. The example deck
+  syncs this in JS via `slide.slideBackgroundElement`, so background
+  gradients targeted at `.slide-background[data-state~="cover"]` etc.
+  actually apply. If you add another gradient state, add the JS mirror call
+  too.
+
+- **Print-PDF mode.** Append `?print-pdf` to the URL. Reveal's bundled
+  print stylesheet activates automatically (it's included in `reveal.css`
+  in v5.x). Background animations are disabled in print mode by the
+  `.print-pdf` CSS overrides at the bottom of `kth-reveal.css` so each
+  page gets a stable frame.
+
+- **Embedding widgets.** Use `<iframe class="widget" data-src="…">` (note
+  `data-src`, not `src`). Reveal injects `src` only when the slide is in
+  view, which keeps off-screen interactive widgets from running on the CPU.
+  Drop standalone HTML into `reveal/widgets/` — `orbit.html` is the
+  reference example. For a Claude Design widget, the same iframe pattern
+  applies; just paste the standalone export into `widgets/`.
+
+- **Master-slide chrome.** The small dark KTH logo bottom-left and the top
+  blue rule come from `<div class="kth-page-frame">` rendered once at the
+  top of `<div class="reveal">`. It's hidden via `body.cover` /
+  `body.divider` / `body.closing` body classes — those are toggled by
+  reveal automatically based on `data-state`.
+
+- **CI preview.** `reveal/build-preview.mjs` spins up a local static
+  server, drives Puppeteer to screenshot slide 1 (the cover) at
+  1920×1080, and exports the full deck via `?print-pdf` to
+  `example-reveal.pdf`. It needs the script to run from the repo root so
+  that `../KTH_logo_RGB_bla.png` resolves; the GH workflow installs
+  puppeteer into `$RUNNER_TEMP/puppeteer-deps` and points `NODE_PATH`
+  at it.
 
 ## Consumer-example pattern
 

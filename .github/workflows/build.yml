@@ -50,8 +50,12 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install md-to-pdf
-        run: npm install -g md-to-pdf
+      - name: Install md-to-pdf and puppeteer
+        run: |
+          npm install -g md-to-pdf
+          # puppeteer is needed by reveal/build-preview.mjs; install it
+          # locally (no-save) so we don't pollute the repo with package.json.
+          npm install --no-save --prefix "$RUNNER_TEMP/puppeteer-deps" puppeteer
 
       # Ubuntu 24.04 (ubuntu-latest) restricts unprivileged user namespaces
       # via AppArmor, which breaks Puppeteer's bundled Chromium sandbox.
@@ -84,9 +88,21 @@ jobs:
         run: make -C consumer-example/docs LATEX=lualatex
 
       # --------------------------------------------------------------- #
-      # Render first-page PNG previews for the README                    #
+      # Build the reveal.js slide deck — first-slide PNG + print-PDF.    #
+      # build-preview.mjs spins up a static server, drives Puppeteer,    #
+      # screenshots slide 1, and exports the deck via reveal's           #
+      # ?print-pdf mode.                                                 #
       # --------------------------------------------------------------- #
-      - name: Render preview PNGs
+      - name: Build reveal slides preview
+        env:
+          NODE_PATH: ${{ runner.temp }}/puppeteer-deps/node_modules
+        run: node reveal/build-preview.mjs
+
+      # --------------------------------------------------------------- #
+      # Render first-page PNG previews for the README                    #
+      # (the reveal preview is written directly by build-preview.mjs)    #
+      # --------------------------------------------------------------- #
+      - name: Render LaTeX/Markdown preview PNGs
         run: |
           mkdir -p docs/preview
           pdftoppm -png -r 150 -f 1 -l 1 example-tex.pdf docs/preview/example-tex
@@ -104,6 +120,7 @@ jobs:
           path: |
             example-tex.pdf
             example-md.pdf
+            example-reveal.pdf
             consumer-example/docs/*.pdf
             docs/preview/*.png
 

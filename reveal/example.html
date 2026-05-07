@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KTH reveal.js template — Example deck</title>
+
+  <!--
+    KTH reveal.js example deck.
+
+    Compile / preview:
+      Just open this file in a browser:    open reveal/example.html
+      Or, while iterating with widgets:    npx http-server -p 8080 .  →  http://localhost:8080/reveal/example.html
+      Print to PDF:                        append ?print-pdf, then ⌘/Ctrl+P → Save as PDF
+                                           (use 1920×1080 paper, no margins, "Background graphics" on)
+
+    Authoring cheatsheet:
+      <section data-state="cover">          cover slide layout
+      <p class="subtitle">…</p>             subtitle below H1
+      <p class="doctype">…</p>              document-type label
+      <span class="kthhl">word</span>       bold + KTH blue
+      <div class="notebox">…</div>          sand-coloured note box
+      <div class="kthbox">…</div>           light-blue highlighted box
+      <div class="palette">…</div>          grid of .swatch chips
+      <div class="cols-2">…</div>           two-column layout
+      <section data-state="divider">        section-divider slide
+      <section data-state="closing">        closing slide layout
+      <iframe class="widget" data-src="…">  embed an interactive widget
+
+    Per-slide options worth knowing about:
+      data-transition="fade|slide|convex|concave|zoom|none"
+      data-background-color="#…", data-background-gradient="…"
+      data-auto-animate                     morph matched elements between siblings
+      class="fragment"                      stagger element reveal within a slide
+  -->
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css">
+  <link rel="stylesheet" href="kth-reveal.css">
+</head>
+<body>
+
+<div class="reveal">
+
+  <!-- Master-slide chrome: small dark KTH logo + top blue rule for content
+       slides. Hidden automatically on cover/divider/closing via body class. -->
+  <div class="kth-page-frame">
+    <img class="page-logo" src="../KTH_logo_RGB_bla.png" alt="KTH">
+  </div>
+
+  <!-- Inverted KTH logo overlay — only shown when the cover slide is active. -->
+  <img class="cover-logo" src="../KTH_logo_RGB_bla.png" alt="KTH">
+
+  <div class="slides">
+
+    <!-- ==================================================================
+         1. Cover — gradient comes from the slide-background (data-state).
+         ================================================================== -->
+    <section data-state="cover" data-transition="fade">
+      <p class="doctype">Activity Report · 2026</p>
+      <hr class="cover-rule">
+      <h1>Project&nbsp;Title</h1>
+      <p class="subtitle">A short, informative subtitle that<br>spans up to two lines</p>
+      <p class="meta">
+        <strong>Firstname Lastname</strong> &middot;
+        School of Engineering Sciences (SCI), KTH<br>
+        May 2026 &middot; v1.0
+      </p>
+    </section>
+
+    <!-- ==================================================================
+         2. Heading hierarchy — proves the visual ratios match LaTeX/Markdown
+         ================================================================== -->
+    <section>
+      <h2>Heading hierarchy</h2>
+
+      <p>
+        Heading sizes mirror the LaTeX class and Markdown theme:
+        <span class="kthhl">1.65× / 1.25× / 1.10× / 1.0×</span> the body size.
+      </p>
+
+      <h1 class="fragment fade-in" style="margin-top: 0.8em;">H1 — slide title</h1>
+      <h2 class="fragment fade-in" style="border-bottom: 0; padding: 0; margin-top: 0.6em;">
+        H2 — section heading with blue rule
+      </h2>
+      <h3 class="fragment fade-in">H3 — subsection</h3>
+      <h4 class="fragment fade-in">H4 — italic, muted blue</h4>
+
+      <p class="fragment fade-in" style="margin-top: 1em; font-size: 0.85em; color: var(--kth-gray-dark);">
+        Headings use Figtree (semibold/bold). Body uses Georgia.
+      </p>
+    </section>
+
+    <!-- ==================================================================
+         3. Section divider — Identity
+         ================================================================== -->
+    <section data-state="divider" data-transition="convex">
+      <p class="eyebrow">Part 1 of 4</p>
+      <h2>Identity</h2>
+      <p class="lead">Colour, type, and layout from the KTH Grafisk manual&nbsp;v1.2 (2024).</p>
+    </section>
+
+    <!-- ==================================================================
+         4. Primary palette — staggered swatch reveal
+         ================================================================== -->
+    <section>
+      <h2>Primary palette</h2>
+
+      <div class="palette" id="palette-primary">
+        <div class="swatch" style="background: var(--kth-blue);">
+          <div class="name">kthblue</div>
+          <div class="hex">#004791</div>
+        </div>
+        <div class="swatch" style="background: var(--kth-skyblue);">
+          <div class="name">kthskyblue</div>
+          <div class="hex">#6298D2</div>
+        </div>
+        <div class="swatch" style="background: var(--kth-navy);">
+          <div class="name">kthnavy</div>
+          <div class="hex">#000061</div>
+        </div>
+        <div class="swatch light" style="background: var(--kth-lightblue);">
+          <div class="name">kthlightblue</div>
+          <div class="hex">#DEF0FF</div>
+        </div>
+        <div class="swatch" style="background: var(--kth-digitalblue);">
+          <div class="name">kthdigitalblue</div>
+          <div class="hex">#0029ED</div>
+        </div>
+        <div class="swatch light" style="background: var(--kth-sand);">
+          <div class="name">kthsand</div>
+          <div class="hex">#EBE5E0</div>
+        </div>
+        <div class="swatch light" style="background: var(--kth-white); border: 1px solid var(--kth-gray-light);">
+          <div class="name">kthwhite</div>
+          <div class="hex">#FFFFFF</div>
+        </div>
+        <div class="swatch" style="background: var(--kth-brokenblack);">
+          <div class="name">kthbrokenblack</div>
+          <div class="hex">#212121</div>
+        </div>
+      </div>
+
+      <p style="margin-top: 0.6em; font-size: 0.8em; color: var(--kth-gray-dark);">
+        Use <code>var(--kth-blue)</code> in CSS, or <code>\textcolor{kthblue}{…}</code> in LaTeX —
+        the names are stable across all three template flows.
+      </p>
+    </section>
+
+    <!-- ==================================================================
+         5. Functional palette — 5 families × 3 variants
+         ================================================================== -->
+    <section>
+      <h2>Functional palette</h2>
+
+      <p style="font-size: 0.8em; margin-bottom: 0.6em;">
+        Five families, each with <span class="kthhl">dark / mid / light</span> variants.
+        Use them for charts, diagrams, and accents — never for body text.
+      </p>
+
+      <div class="palette-fn" id="palette-functional">
+        <div class="row-label">green</div>
+        <div class="swatch"       style="background: var(--kth-green-dark);"><div class="name">dark</div><div class="hex">#0D4A21</div></div>
+        <div class="swatch"       style="background: var(--kth-green);"><div class="name">mid</div><div class="hex">#4DA060</div></div>
+        <div class="swatch light" style="background: var(--kth-green-light);"><div class="name">light</div><div class="hex">#C7EBBA</div></div>
+
+        <div class="row-label">teal</div>
+        <div class="swatch"       style="background: var(--kth-teal-dark);"><div class="name">dark</div><div class="hex">#1C434C</div></div>
+        <div class="swatch"       style="background: var(--kth-teal);"><div class="name">mid</div><div class="hex">#339C9C</div></div>
+        <div class="swatch light" style="background: var(--kth-teal-light);"><div class="name">light</div><div class="hex">#B2E0E0</div></div>
+
+        <div class="row-label">brick</div>
+        <div class="swatch"       style="background: var(--kth-brick-dark);"><div class="name">dark</div><div class="hex">#78001A</div></div>
+        <div class="swatch"       style="background: var(--kth-brick);"><div class="name">mid</div><div class="hex">#E86A58</div></div>
+        <div class="swatch light" style="background: var(--kth-brick-light);"><div class="name">light</div><div class="hex">#FFCCC4</div></div>
+
+        <div class="row-label">yellow</div>
+        <div class="swatch"       style="background: var(--kth-yellow-dark);"><div class="name">dark</div><div class="hex">#A65900</div></div>
+        <div class="swatch light" style="background: var(--kth-yellow);"><div class="name">mid</div><div class="hex">#FFBE00</div></div>
+        <div class="swatch light" style="background: var(--kth-yellow-light);"><div class="name">light</div><div class="hex">#FFF0B0</div></div>
+
+        <div class="row-label">gray</div>
+        <div class="swatch"       style="background: var(--kth-gray-dark);"><div class="name">dark</div><div class="hex">#323232</div></div>
+        <div class="swatch"       style="background: var(--kth-gray);"><div class="name">mid</div><div class="hex">#A5A5A5</div></div>
+        <div class="swatch light" style="background: var(--kth-gray-light);"><div class="name">light</div><div class="hex">#E6E6E6</div></div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         6. Callouts and inline highlight
+         ================================================================== -->
+    <section>
+      <h2>Callouts &amp; highlight</h2>
+
+      <div class="cols-2">
+        <div>
+          <h3>Highlighted box</h3>
+          <div class="kthbox">
+            <strong>Summary.</strong> Light-blue <code>.kthbox</code> mirrors the
+            <code>kthbox</code> environment in the LaTeX class — use for abstracts,
+            takeaways, or framed quotes.
+          </div>
+
+          <h3 style="margin-top: 0.8em;">Note box</h3>
+          <div class="notebox">
+            <strong>Note.</strong> Sand <code>.notebox</code> is for caveats and
+            supplementary information.
+          </div>
+        </div>
+
+        <div>
+          <h3>Inline highlight</h3>
+          <p>
+            The <span class="kthhl">.kthhl class</span> renders a keyword in bold
+            KTH&nbsp;blue — same visual as <code>\kthhl{…}</code> in LaTeX or
+            <code>&lt;span class="kthhl"&gt;</code> in Markdown. Use it
+            <span class="kthhl">sparingly</span> so it stays a signal, not noise.
+          </p>
+
+          <h3 style="margin-top: 1em;">Lists</h3>
+          <ul>
+            <li>Bullets use <span class="kthhl">KTH blue</span> markers.</li>
+            <li class="fragment fade-in">Fragments stagger reveal within a slide.</li>
+            <li class="fragment fade-in">Up-arrow rewinds them.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         7. Code slide — highlight.js with KTH-tinted tokens
+         ================================================================== -->
+    <section>
+      <h2>Code with syntax highlighting</h2>
+
+      <pre><code class="language-python" data-trim data-line-numbers="|1-3|5-9|11-14">
+import numpy as np
+from kth_research import experiment, palette
+
+KTH_BLUE = "#004791"
+
+def measure(samples: int = 1024) -> np.ndarray:
+    """Return a vector of measurements in KTH-friendly units."""
+    rng = np.random.default_rng(seed=42)
+    return rng.normal(loc=0.0, scale=1.0, size=samples)
+
+if __name__ == "__main__":
+    data = measure()
+    fig  = experiment.plot(data, color=KTH_BLUE)
+    fig.savefig("results.pdf")
+      </code></pre>
+
+      <p style="font-size: 0.75em; color: var(--kth-gray-dark);">
+        <code>data-line-numbers="|1-3|5-9|11-14"</code> walks through the highlighted
+        regions on each press of the right-arrow key.
+      </p>
+    </section>
+
+    <!-- ==================================================================
+         8. Big stat (auto-animate, part 1)
+         ================================================================== -->
+    <section data-auto-animate data-transition="fade">
+      <h2 style="border-bottom: 0;">By the numbers</h2>
+      <div style="margin-top: 1.2em; display: flex; gap: 3em; align-items: flex-end;">
+        <div data-id="stat-1">
+          <div class="big-stat" style="color: var(--kth-blue);">14&thinsp;000</div>
+          <div class="big-stat-label">students at KTH</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         9. Big stat (auto-animate, part 2) — first stat shrinks, more appear
+         ================================================================== -->
+    <section data-auto-animate data-transition="fade">
+      <h2 style="border-bottom: 0;">By the numbers</h2>
+      <div style="margin-top: 0.8em; display: flex; gap: 2.6em; align-items: flex-end; flex-wrap: wrap;">
+        <div data-id="stat-1">
+          <div class="big-stat" style="font-size: 4em; color: var(--kth-blue);">14&thinsp;000</div>
+          <div class="big-stat-label">students</div>
+        </div>
+        <div class="fragment fade-up">
+          <div class="big-stat" style="font-size: 4em; color: var(--kth-teal);">5&thinsp;200</div>
+          <div class="big-stat-label">staff &amp; faculty</div>
+        </div>
+        <div class="fragment fade-up">
+          <div class="big-stat" style="font-size: 4em; color: var(--kth-yellow-dark);">5</div>
+          <div class="big-stat-label">schools</div>
+        </div>
+        <div class="fragment fade-up">
+          <div class="big-stat" style="font-size: 4em; color: var(--kth-brick);">1827</div>
+          <div class="big-stat-label">founded</div>
+        </div>
+      </div>
+
+      <p class="fragment fade-in" style="margin-top: 1.4em; font-size: 0.85em; color: var(--kth-gray-dark);">
+        <code>data-auto-animate</code> morphs matched <code>data-id</code> elements between sibling slides.
+      </p>
+    </section>
+
+    <!-- ==================================================================
+         10. Section divider — Interactivity
+         ================================================================== -->
+    <section data-state="divider" data-transition="convex">
+      <p class="eyebrow">Part 2 of 2</p>
+      <h2>Interactivity</h2>
+      <p class="lead">Inline canvas, embedded widgets, and arbitrary web&nbsp;apps&nbsp;— all live in your slides.</p>
+    </section>
+
+    <!-- ==================================================================
+         11. Inline interactive widget — Lissajous-style canvas animation
+         ================================================================== -->
+    <section data-transition="fade">
+      <h2>Inline canvas animation</h2>
+
+      <div class="cols-2" style="grid-template-columns: 1fr 1.2fr;">
+        <div>
+          <p>
+            Drop a <code>&lt;canvas&gt;</code> straight into a slide and animate it
+            with a script tag. The slide fires <span class="kthhl">visibility events</span>
+            so you can start/pause animations as the user navigates.
+          </p>
+          <ul>
+            <li><code>fragmentshown</code> · <code>fragmenthidden</code></li>
+            <li><code>slidechanged</code> · <code>slidetransitionend</code></li>
+            <li>Reveal exposes <code>Reveal.getCurrentSlide()</code></li>
+          </ul>
+        </div>
+        <div>
+          <canvas id="lissajous" width="640" height="420"
+                  style="width: 100%; height: 420px; background: var(--kth-sand); border-radius: 6px;"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         12. Iframe widget — full-bleed orbit.html
+         ================================================================== -->
+    <section data-transition="fade">
+      <h2 style="margin-bottom: 0.4em;">Embedded widget · <code>widgets/orbit.html</code></h2>
+
+      <iframe class="widget" data-src="widgets/orbit.html" loading="lazy"
+              style="height: 760px;"></iframe>
+
+      <p style="margin-top: 0.4em; font-size: 0.75em; color: var(--kth-gray-dark);">
+        Use <code>data-src</code> (not <code>src</code>) so reveal.js can pause off-screen
+        widgets to keep your CPU cool. Drop any Claude Design widget or web app into
+        <code>widgets/</code> and reference it the same way.
+      </p>
+    </section>
+
+    <!-- ==================================================================
+         13. Closing
+         ================================================================== -->
+    <section data-state="closing" data-transition="zoom">
+      <h2>Tack!</h2>
+      <span class="accent-rule"></span>
+      <p class="lead">Questions, comments, ideas&nbsp;—<br>
+        <a href="mailto:name@kth.se" style="color: var(--kth-yellow); border-bottom-color: var(--kth-yellow);">name@kth.se</a>
+      </p>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/notes/notes.js"></script>
+
+<script>
+  Reveal.initialize({
+    width: 1920,
+    height: 1080,
+    margin: 0.045,
+
+    // Top-align content slides — cover/divider/closing handle their own
+    // vertical layout via flexbox in kth-reveal.css.
+    center: false,
+
+    controls: true,
+    controlsTutorial: false,
+    progress: true,
+    history: true,
+    hash: true,
+
+    slideNumber: 'c/t',
+    showSlideNumber: 'speaker',
+
+    transition: 'slide',
+    transitionSpeed: 'default',
+    backgroundTransition: 'fade',
+
+    pdfSeparateFragments: false,
+
+    plugins: [ RevealHighlight, RevealNotes ],
+  });
+
+  // Reveal does not mirror data-state from <section> to its
+  // .slide-background div. We mirror it ourselves so that the cover/divider/
+  // closing background gradients (defined in kth-reveal.css against
+  // .slide-background[data-state~="…"]) actually apply.
+  // Each <section> has a slideBackgroundElement reference, which is the
+  // canonical link in both live and print-pdf modes.
+  function mirrorStateToBackgrounds() {
+    document.querySelectorAll('.reveal .slides section').forEach((slide) => {
+      const state = slide.dataset.state;
+      const bg    = slide.slideBackgroundElement;
+      if (!bg) return;
+      if (state) bg.dataset.state = state;
+      else       delete bg.dataset.state;
+    });
+  }
+  Reveal.on('ready', mirrorStateToBackgrounds);
+  Reveal.on('slidechanged', mirrorStateToBackgrounds);
+
+  // Stagger swatch entry per palette grid by setting a CSS animation-delay
+  // on each child according to its DOM position.
+  function staggerSwatches(el, step = 0.05, base = 0.05) {
+    if (!el) return;
+    [...el.children].forEach((child, i) => {
+      child.style.animationDelay = (base + i * step) + 's';
+    });
+  }
+  staggerSwatches(document.getElementById('palette-primary'));
+  staggerSwatches(document.getElementById('palette-functional'), 0.035, 0.05);
+
+  // Re-trigger swatch animation when its slide becomes current.
+  Reveal.on('slidechanged', (event) => {
+    event.currentSlide.querySelectorAll('.palette, .palette-fn').forEach(grid => {
+      [...grid.children].forEach(c => {
+        c.style.animation = 'none';
+        c.offsetHeight;                   // force reflow
+        c.style.animation = '';
+      });
+    });
+  });
+
+  // Inline canvas widget (slide 11) — Lissajous figure that drifts colour
+  // through the KTH palette. Pauses when its slide is not visible.
+  (() => {
+    const canvas = document.getElementById('lissajous');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const COLORS = [
+      '#004791', '#6298D2', '#339C9C', '#4DA060',
+      '#FFBE00', '#E86A58', '#000061',
+    ];
+
+    let t = 0;
+    let running = true;
+    let trail = [];
+
+    function step() {
+      if (!running) return;
+      const W = canvas.width, H = canvas.height;
+      ctx.fillStyle = 'rgba(235, 229, 224, 0.06)';
+      ctx.fillRect(0, 0, W, H);
+
+      const cx = W / 2, cy = H / 2;
+      const a = 3, b = 4;
+      const phase = t * 0.0008;
+      const x = cx + Math.cos(a * t * 0.01 + phase) * (W * 0.35);
+      const y = cy + Math.sin(b * t * 0.01) * (H * 0.38);
+
+      trail.push({ x, y });
+      if (trail.length > 240) trail.shift();
+
+      for (let i = 1; i < trail.length; i++) {
+        const p0 = trail[i - 1], p1 = trail[i];
+        const ratio = i / trail.length;
+        const colour = COLORS[Math.floor((t * 0.005 + ratio * 2) % COLORS.length)];
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = 2 + ratio * 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.stroke();
+      }
+      t += 1;
+      requestAnimationFrame(step);
+    }
+
+    step();
+
+    // Pause when slide isn't visible — reveal fires slidechanged.
+    Reveal.on('slidechanged', (event) => {
+      const onSlide = event.currentSlide.contains(canvas);
+      if (onSlide && !running) { running = true; step(); }
+      if (!onSlide) { running = false; }
+    });
+  })();
+</script>
+
+</body>
+</html>
