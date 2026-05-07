@@ -81,14 +81,13 @@
 \else\ifLuaTeX
   \RequirePackage{fontspec}
   % Figtree is distributed as a variable font (wght axis).
-  % LuaLaTeX needs the HarfBuzz renderer to address weight axes directly;
-  % "Figtree Light" is the name luaotfload registers for the installed file.
-  \IfFontExistsTF{Figtree Light}{
-    \newfontfamily\headingfont{Figtree-VariableFont_wght}[
-      Extension    = .ttf,
+  % LuaLaTeX uses HarfBuzz to request axis weights directly from the
+  % installed family.
+  \IfFontExistsTF{Figtree}{
+    \newfontfamily\headingfont{Figtree}[
       Renderer     = HarfBuzz,
-      RawFeature   = {axis={wght:400}},           % upright weight
-      BoldFont     = Figtree-VariableFont_wght,
+      RawFeature   = {axis={wght:400}},           % Regular weight (400)
+      BoldFont     = Figtree,
       BoldFeatures = {RawFeature={axis={wght:600}}} % SemiBold for \bfseries
     ]
   }{
