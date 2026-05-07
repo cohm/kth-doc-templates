@@ -46,7 +46,7 @@ from each CI run are available as workflow artefacts.
 \end{document}
 ```
 
-Compile with `pdflatex` or `lualatex`/`xelatex` for exact KTH fonts. CI uses `lualatex` for the generated preview image.
+Compiling with `pdflatex` works just fine, but if you use `lualatex`/`xelatex` you get the exact KTH fonts. The CI uses `lualatex` for the generated preview image.
 
 ## Quick start (Markdown)
 
