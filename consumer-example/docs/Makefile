@@ -14,8 +14,10 @@
 #   make clean      remove build artefacts
 
 TEMPLATES := .templates
+LATEX ?= pdflatex
 
-# pdflatex sees the class file and logo via TEXINPUTS — no path prefix needed
+# The selected LaTeX engine sees the class file and logo via TEXINPUTS — no
+# path prefix needed
 # in \documentclass{kth-document} or \kthlogopath.
 TEXINPUTS_PREFIX := .:$(TEMPLATES):
 
@@ -41,11 +43,11 @@ tex: $(TEX_PDFS)
 	mv $*.pdf $@
 
 # ----- LaTeX -------------------------------------------------------------- #
-# Run pdflatex twice for cross-references / TOC. -jobname controls the
+# Run the selected LaTeX engine twice for cross-references / TOC. -jobname controls the
 # output stem so it doesn't clash with the markdown build.
 %-tex.pdf: %.tex $(TEMPLATES)/kth-document.cls $(TEMPLATES)/KTH_logo_RGB_bla.png
-	TEXINPUTS=$(TEXINPUTS_PREFIX) pdflatex -interaction=nonstopmode -jobname=$*-tex $<
-	TEXINPUTS=$(TEXINPUTS_PREFIX) pdflatex -interaction=nonstopmode -jobname=$*-tex $<
+	TEXINPUTS=$(TEXINPUTS_PREFIX) $(LATEX) -interaction=nonstopmode -jobname=$*-tex $<
+	TEXINPUTS=$(TEXINPUTS_PREFIX) $(LATEX) -interaction=nonstopmode -jobname=$*-tex $<
 
 clean:
 	rm -f *.aux *.log *.out *.synctex.gz *-md.pdf *-tex.pdf
