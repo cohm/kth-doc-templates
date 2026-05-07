@@ -38,10 +38,12 @@ jobs:
           set -euo pipefail
           sudo mkdir -p /usr/local/share/fonts/truetype/figtree
           # Source file is URL-encoded as Figtree%5Bwght%5D.ttf; keep a
-          # shell-safe local filename without brackets.
-          sudo curl -fsSL \
+          # shell-safe local filename without brackets. LuaLaTeX resolves
+          # this by family name ("Figtree"), not by filename.
+          sudo curl -fsSL --retry 3 --retry-delay 2 --retry-connrefused \
             https://raw.githubusercontent.com/google/fonts/main/ofl/figtree/Figtree%5Bwght%5D.ttf \
             -o /usr/local/share/fonts/truetype/figtree/Figtree-VariableFont_wght.ttf
+          test -s /usr/local/share/fonts/truetype/figtree/Figtree-VariableFont_wght.ttf
           sudo fc-cache -f
 
       - uses: actions/setup-node@v4
