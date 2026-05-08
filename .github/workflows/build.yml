@@ -53,9 +53,11 @@ jobs:
       - name: Install md-to-pdf and puppeteer
         run: |
           npm install -g md-to-pdf
-          # puppeteer is needed by reveal/build-preview.mjs; install it
-          # locally (no-save) so we don't pollute the repo with package.json.
-          npm install --no-save --prefix "$RUNNER_TEMP/puppeteer-deps" puppeteer
+          # puppeteer is needed by reveal/build-preview.mjs (ESM import).
+          # Node's ESM resolver walks up from the script's directory looking
+          # for node_modules — NODE_PATH does NOT help for ESM, only CJS —
+          # so we install at the repo root.
+          npm install --no-save --no-package-lock puppeteer
 
       # Ubuntu 24.04 (ubuntu-latest) restricts unprivileged user namespaces
       # via AppArmor, which breaks Puppeteer's bundled Chromium sandbox.
@@ -94,8 +96,6 @@ jobs:
       # ?print-pdf mode.                                                 #
       # --------------------------------------------------------------- #
       - name: Build reveal slides preview
-        env:
-          NODE_PATH: ${{ runner.temp }}/puppeteer-deps/node_modules
         run: node reveal/build-preview.mjs
 
       # --------------------------------------------------------------- #

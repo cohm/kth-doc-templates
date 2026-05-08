@@ -3,3 +3,7 @@
 *.pdf
 *.synctex.gz
 *.log
+
+# Transient: puppeteer installed by reveal/build-preview.mjs (CI + local dev)
+node_modules/
+package-lock.json

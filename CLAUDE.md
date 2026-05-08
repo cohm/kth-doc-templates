@@ -33,8 +33,8 @@ md-to-pdf example.md --config-file md-to-pdf.json --document-title "Project Titl
 
 # Slides
 open reveal/example.html                                       # live preview
+npm install --no-save puppeteer                                # one-time, in repo root
 node reveal/build-preview.mjs                                  # → docs/preview/example-reveal.png + example-reveal.pdf
-                                                               # (needs `npm install --no-save puppeteer`)
 
 # Consumer example (exercises the submodule pattern via a .templates symlink)
 make -C consumer-example/docs
