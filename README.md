@@ -90,13 +90,30 @@ the deck as PDF, append `?print-pdf` to the URL and use the browser's "Save
 as PDF" with paper size 1920×1080, no margins, and "Background graphics"
 turned on. CI does this automatically (see workflow artefacts).
 
-The same custom-property names from `md-to-pdf.css` (`--kth-blue`,
-`--kth-yellow`, `--kth-sand`, …) are exposed in the slide theme, so palette
-choices stay in sync across the three template flows. Authoring cheatsheet:
+The slide theme follows the official KTH PowerPoint master (per the
+[kthpq](https://github.com/th-rtyf-re/kthpq) Beamer port): light-blue cover
+with KTH logo top-centre and the wave-line *Linjemonster* corner motif,
+white content slides with logo top-left and a sky-blue footer, sand-coloured
+section dividers, and a KTH-blue closing slide. Figtree throughout. The
+same custom-property names from `md-to-pdf.css` (`--kth-blue`, `--kth-navy`,
+`--kth-sand`, …) are exposed in the slide theme so palette choices stay in
+sync across the three template flows.
 
-- `<section data-state="cover">` — cover slide with KTH-blue gradient
-- `<section data-state="divider">` — section-divider slide
-- `<section data-state="closing">` — closing slide
+Set the deck-wide author and institute via attributes on the `.reveal`
+wrapper — they appear in the footer of every content slide:
+
+```html
+<div class="reveal"
+     data-kth-author="Firstname Lastname"
+     data-kth-institute="School of Engineering Sciences (SCI), KTH">
+```
+
+Authoring cheatsheet:
+
+- `<section data-state="cover">` — light-blue cover with logo top-centre
+- `<section data-state="divider">` — sand divider with line motif
+- `<section data-state="closing">` — KTH-blue end slide, white logo centred
+- `<p class="section-name">…</p>` — sky-blue eyebrow above a slide title
 - `<div class="palette">` / `.palette-fn` — animated swatch grids
 - `<div class="cols-2">` — two-column layout
 - `<iframe class="widget" data-src="widgets/foo.html">` — embed an

@@ -1,26 +1,30 @@
 /* KTH reveal.js theme
- * Mirrors kth-document.cls and md-to-pdf.css — implements the KTH Graphical
- * Profile (Grafisk manual v1.2, 2024) for HTML slide decks rendered with
- * reveal.js (https://revealjs.com).
+ * Mirrors the official KTH PowerPoint master (per the kthpq Beamer port)
+ * and stays visually in step with kth-document.cls / md-to-pdf.css.
  *
- * Aspect:    16:9, 1920×1080 — set in reveal.initialize({width, height})
- * Fonts:     Figtree (headings, Google Fonts) + Georgia (body)
- * Palette:   KTH primary + functional colours (CSS custom properties below
- *            mirror the names used in md-to-pdf.css for portability)
+ * Design reference: KTH Grafisk manual v1.2 (2024) + th-rtyf-re/kthpq.
  *
- * Custom classes (drop into your <section> tags):
- *   <section data-state="cover">                cover slide layout
- *   <p class="subtitle">…</p>                   subtitle below H1
- *   <p class="doctype">…</p>                    document-type label
- *   <span class="kthhl">word</span>             bold + KTH blue
- *   <div class="notebox">…</div>                sand-coloured note box
+ * Aspect:   16:9, 1920×1080
+ * Fonts:    Figtree throughout (headings + body)
+ * Sizing:   Base font 42px (presentation-scale). All heading sizes are
+ *           explicit pixel values so the hierarchy is stable.
+ *
+ * Slide variants (set via `data-state` on the <section>):
+ *   data-state="cover"     light-blue cover, KTH logo top-centre, navy title
+ *   data-state="divider"   sand background, KTH logo top-left, navy title
+ *   data-state="closing"   KTH-blue background, white logo centred
+ *   (default)              white content master, KTH logo top-left, footer
+ *
+ * Custom classes:
+ *   <span class="kthhl">word</span>             bold + KTH blue keyword
+ *   <div class="notebox">…</div>                sand callout box
  *   <div class="kthbox">…</div>                 light-blue highlighted box
  *   <div class="palette">…</div>                grid of .swatch chips
- *   <div class="cols-2">…</div>                 two-column layout
+ *   <div class="cols-2">…</div> / .cols-3       column layouts
  *
- * Master-slide chrome (small KTH logo bottom-left, slide number bottom-right)
- * is provided by .kth-page-frame inside .reveal — see example.html.
- * The cover slide hides this chrome via data-state="cover".
+ * Content-slide chrome (`.kth-master`) renders the small KTH logo top-left,
+ * the section / frame-title header band, and the sky-blue footer with author
+ * / institute / page number — driven by data attributes on .reveal.
  */
 
 @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap');
@@ -49,37 +53,37 @@
   --kth-muted:  var(--kth-sand);
 
   --heading-font: 'Figtree', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  --body-font:    Georgia, 'Times New Roman', serif;
+  --body-font:    'Figtree', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --mono-font:    'SF Mono', Menlo, Monaco, Consolas, monospace;
 }
 
 /* ------------------------------------------------------------------------- */
-/* Override reveal.js defaults via its own custom properties                 */
-/* (heading ratios mirror the LaTeX class: 1.65 / 1.25 / 1.10 / 1.0 of base) */
+/* Reveal.js variable overrides                                              */
+/* Heading sizes are explicit px multiples of the 42px base so the           */
+/* hierarchy is large and obvious (presentation-scale, not document-scale).  */
 /* ------------------------------------------------------------------------- */
-.reveal-viewport {
-  background: var(--kth-white);
-}
+.reveal-viewport { background: var(--kth-brokenwhite); }
 
 .reveal {
-  --r-background-color: var(--kth-white);
+  --r-background-color:   var(--kth-brokenwhite);
 
-  --r-main-font:        var(--body-font);
-  --r-main-font-size:   34px;
-  --r-main-color:       var(--kth-brokenblack);
+  --r-main-font:          var(--body-font);
+  --r-main-font-size:     42px;
+  --r-main-color:         var(--kth-brokenblack);
+  --r-block-margin:       0.6em;
 
   --r-heading-font:           var(--heading-font);
-  --r-heading-color:          var(--kth-blue);
-  --r-heading-line-height:    1.15;
+  --r-heading-color:          var(--kth-navy);
+  --r-heading-line-height:    1.12;
   --r-heading-letter-spacing: normal;
   --r-heading-text-transform: none;
   --r-heading-text-shadow:    none;
   --r-heading-font-weight:    700;
-  --r-heading1-text-shadow:   none;
-  --r-heading1-size:          2.4em;
-  --r-heading2-size:          1.55em;
-  --r-heading3-size:          1.20em;
-  --r-heading4-size:          1.00em;
+
+  --r-heading1-size:          92px;  /* slide title (h1) */
+  --r-heading2-size:          60px;  /* section / panel (h2) */
+  --r-heading3-size:          44px;  /* subsection (h3) */
+  --r-heading4-size:          34px;  /* h4 — only slightly bigger than body */
 
   --r-code-font:              var(--mono-font);
 
@@ -91,47 +95,30 @@
   --r-selection-color:            var(--kth-blue);
 }
 
-.reveal .slides {
-  text-align: left;
-}
-
-.reveal .slides > section,
-.reveal .slides > section > section {
-  padding: 40px 0 30px;
-}
+.reveal .slides { text-align: left; }
 
 .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
   font-family: var(--heading-font);
-  color: var(--kth-blue);
+  color: var(--kth-navy);
   text-transform: none;
   letter-spacing: normal;
   font-weight: 700;
   margin: 0 0 0.4em 0;
   text-shadow: none;
+  line-height: 1.12;
 }
 
-.reveal h2 {
-  padding-bottom: 0.18em;
-  border-bottom: 2px solid var(--kth-blue);
-  margin-bottom: 0.6em;
-}
-
-.reveal h3 {
-  color: color-mix(in srgb, var(--kth-blue) 85%, black);
-}
-
-.reveal h4 {
-  color: color-mix(in srgb, var(--kth-blue) 70%, white);
-  font-weight: 500;
-  font-style: italic;
-}
+.reveal h1 { font-size: var(--r-heading1-size); }
+.reveal h2 { font-size: var(--r-heading2-size); color: var(--kth-navy); }
+.reveal h3 { font-size: var(--r-heading3-size); color: var(--kth-blue); font-weight: 600; }
+.reveal h4 { font-size: var(--r-heading4-size); color: var(--kth-blue); font-weight: 500; }
 
 .reveal p { margin: 0 0 0.6em; }
 
 .reveal ul, .reveal ol { margin: 0.4em 0 0.8em; }
-.reveal li { margin: 0.2em 0; }
-.reveal ul li::marker { color: var(--kth-blue); }
-.reveal ol li::marker { color: var(--kth-blue); font-weight: 600; }
+.reveal li          { margin: 0.25em 0; }
+.reveal ul li::marker { color: var(--kth-navy); }
+.reveal ol li::marker { color: var(--kth-navy); font-weight: 600; }
 
 .reveal a, .reveal a:visited {
   color: var(--kth-blue);
@@ -141,242 +128,277 @@
 .reveal a:hover { color: var(--kth-digitalblue); }
 
 /* ------------------------------------------------------------------------- */
-/* Cover slide                                                               */
-/*                                                                           */
-/* The cover gets its full-bleed gradient via reveal's background system —   */
-/* set data-state="cover" on the <section> and reveal mirrors it to          */
-/* .slide-background, which always fills the slide canvas regardless of     */
-/* content height. This is much more reliable than section::before in both  */
-/* live render and print-pdf mode.                                           */
+/* Linjemonster — KTH's signature wave-line corner decoration.                */
+/* Recreated as inline SVG data URIs in sky-blue. Applied per-section as     */
+/* ::before (top-left) and ::after (bottom-right) on cover/divider slides.   */
 /* ------------------------------------------------------------------------- */
-/* Cover content is anchored to the lower-left.
-   We use flexbox in the section and an explicit min-height that matches the
-   slide canvas (1080px). Reveal handles the section's positioning; we just
-   make sure the section is at least slide-tall so content sits at the bottom. */
-/* Cover layout — content anchored at the lower-left via large top padding.
-   We don't rely on flex or absolute positioning here because reveal's
-   print-pdf restructuring distorts both. A fixed top-padding works
-   identically in live render and print mode. */
-.reveal section.cover,
-.reveal section[data-state="cover"] {
-  text-align: left;
-  box-sizing: border-box;
-  padding: 600px 80px 140px 80px !important;
-  min-height: 1080px;
-}
-
-.reveal section.cover h1,
-.reveal section[data-state="cover"] h1 {
-  font-size: 3.4em;
-  line-height: 1.05;
-  margin: 0 0 0.15em 0;
-  color: var(--kth-white);
-  font-weight: 800;
-  letter-spacing: -0.01em;
-}
-
-.reveal section.cover .subtitle,
-.reveal section[data-state="cover"] .subtitle {
-  font-family: var(--heading-font);
-  font-size: 1.6em;
-  font-weight: 400;
-  color: color-mix(in srgb, var(--kth-white) 92%, transparent);
-  margin: 0 0 0.5em 0;
-}
-
-.reveal section.cover .doctype,
-.reveal section[data-state="cover"] .doctype {
-  font-family: var(--heading-font);
-  font-size: 0.9em;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--kth-yellow);
-  margin: 0 0 1.2em 0;
-}
-
-.reveal section.cover .meta,
-.reveal section[data-state="cover"] .meta {
-  font-family: var(--heading-font);
-  font-size: 0.85em;
-  color: color-mix(in srgb, var(--kth-white) 80%, transparent);
-}
-
-.reveal section.cover .meta strong {
-  color: var(--kth-white);
-  font-weight: 600;
-}
-
-.reveal section.cover .cover-rule,
-.reveal section[data-state="cover"] .cover-rule {
-  display: block;
-  width: 120px;
-  height: 6px;
-  background: var(--kth-yellow);
-  margin: 0 0 1.4em 0;
-  border: 0;
-}
-
-/* Layered KTH-blue gradient — applied to the slide-background that reveal
-   generates for slides with data-state="cover". Three stacked layers:
-     1. Top-right skyblue glow
-     2. Bottom-left digital-blue glow
-     3. Diagonal navy↔blue base
-   A slow hue-shift via a CSS variable keeps the cover slide alive without
-   panning radials off-screen during a screenshot. */
-.reveal .slide-background[data-state~="cover"] {
-  background:
-    radial-gradient(ellipse 70% 90% at 85% 15%, color-mix(in srgb, var(--kth-skyblue) 80%, transparent) 0%, transparent 55%),
-    radial-gradient(ellipse 60% 70% at 15% 95%, color-mix(in srgb, var(--kth-digitalblue) 70%, transparent) 0%, transparent 55%),
-    linear-gradient(135deg, var(--kth-navy) 0%, var(--kth-blue) 55%, var(--kth-navy) 100%);
-  background-size: 100% 100%;
-  animation: kth-cover-pulse 8s ease-in-out infinite alternate;
-}
-
-@keyframes kth-cover-pulse {
-  0%   { filter: hue-rotate(0deg)   saturate(1.0); }
-  100% { filter: hue-rotate(-12deg) saturate(1.15); }
-}
-
-/* Cover-slide page-logo overlay — drawn over the gradient.
-   Sits in .reveal so it floats on top of slide-background, hidden via
-   body.cover toggle from the page-frame chrome (which has its own logo). */
-.reveal .cover-logo {
+.reveal section[data-state="cover"]::before {
+  content: "";
   position: absolute;
-  bottom: 60px;
-  right: 60px;
-  height: 64px;
-  filter: brightness(0) invert(1);
-  opacity: 0.95;
-  z-index: 5;
-  pointer-events: none;
-  display: none;
-}
-body.cover .reveal .cover-logo { display: block; }
-
-/* Staggered entry animation for cover-slide elements */
-.reveal section.cover .doctype,
-.reveal section[data-state="cover"] .doctype,
-.reveal section.cover .cover-rule,
-.reveal section[data-state="cover"] .cover-rule,
-.reveal section.cover h1,
-.reveal section[data-state="cover"] h1,
-.reveal section.cover .subtitle,
-.reveal section[data-state="cover"] .subtitle,
-.reveal section.cover .meta,
-.reveal section[data-state="cover"] .meta,
-.reveal section.cover .cover-logo,
-.reveal section[data-state="cover"] .cover-logo {
-  animation: kth-fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-.reveal section.cover .doctype,
-.reveal section[data-state="cover"] .doctype     { animation-delay: 0.05s; }
-.reveal section.cover .cover-rule,
-.reveal section[data-state="cover"] .cover-rule  { animation-delay: 0.20s; }
-.reveal section.cover h1,
-.reveal section[data-state="cover"] h1           { animation-delay: 0.35s; }
-.reveal section.cover .subtitle,
-.reveal section[data-state="cover"] .subtitle    { animation-delay: 0.55s; }
-.reveal section.cover .meta,
-.reveal section[data-state="cover"] .meta        { animation-delay: 0.75s; }
-.reveal section.cover .cover-logo,
-.reveal section[data-state="cover"] .cover-logo  { animation-delay: 0.95s; }
-
-@keyframes kth-fade-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Swatch entrance — staggered fade-up (applied via JS index) */
-.reveal section.current .palette .swatch,
-.reveal section.current .palette-fn .swatch {
-  animation: kth-swatch-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-
-@keyframes kth-swatch-in {
-  from { opacity: 0; transform: translateY(14px) scale(0.96); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-/* Section-divider entry animations */
-.reveal section[data-state="divider"] .eyebrow,
-.reveal section[data-state="divider"] h2,
-.reveal section[data-state="divider"] .lead {
-  animation: kth-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-.reveal section[data-state="divider"] .eyebrow { animation-delay: 0.05s; }
-.reveal section[data-state="divider"] h2       { animation-delay: 0.20s; }
-.reveal section[data-state="divider"] .lead    { animation-delay: 0.45s; }
-
-/* Closing slide entry */
-.reveal section[data-state="closing"] h2,
-.reveal section[data-state="closing"] .lead,
-.reveal section[data-state="closing"] .accent-rule {
-  animation: kth-fade-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-.reveal section[data-state="closing"] h2           { animation-delay: 0.10s; }
-.reveal section[data-state="closing"] .accent-rule { animation-delay: 0.30s; }
-.reveal section[data-state="closing"] .lead        { animation-delay: 0.45s; }
-
-/* The cover slide gets the gradient bled to the viewport edges */
-.reveal section.cover,
-.reveal section[data-state="cover"] {
-  background: transparent;
-}
-body.cover .reveal-viewport { background: var(--kth-navy); }
-
-/* Cover slide content wrapper — push content to upper-left third */
-.reveal section.cover .cover-body,
-.reveal section[data-state="cover"] .cover-body {
-  max-width: 80%;
-  padding: 4vh 0 0 1vw;
-}
-
-/* ------------------------------------------------------------------------- */
-/* Master-slide chrome — logo bottom-left, slide number bottom-right         */
-/* ------------------------------------------------------------------------- */
-.reveal .kth-page-frame {
-  position: absolute;
-  inset: 0;
+  top: 0; left: 0;
+  width: 480px;
+  height: 320px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 480 320' fill='none' stroke='%236298D2' stroke-width='3' stroke-linecap='round'><path d='M-30,30 Q90,5 220,30 T520,30'/><path d='M-30,72 Q110,42 240,72 T520,72'/><path d='M-30,118 Q90,86 220,118 T520,118'/><path d='M-30,170 Q120,138 250,170 T520,170'/><path d='M-30,228 Q100,196 230,228 T520,228'/></svg>");
+  background-repeat: no-repeat;
+  background-size: 100% auto;
   pointer-events: none;
   z-index: 0;
 }
 
-.reveal .kth-page-frame .page-logo {
-  position: absolute;
-  left: 36px;
-  bottom: 24px;
-  height: 36px;
-  opacity: 0.92;
-}
-
-/* Top blue rule on every non-cover slide — mirrors fancyhdr's headrule */
-.reveal .kth-page-frame::before {
+.reveal section[data-state="cover"]::after,
+.reveal section[data-state="divider"]::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: var(--kth-blue);
+  bottom: 0; right: 0;
+  width: 520px;
+  height: 360px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 520 360' fill='none' stroke='%236298D2' stroke-width='3' stroke-linecap='round'><path d='M-20,90 Q120,60 260,90 T560,90'/><path d='M-20,148 Q140,118 280,148 T560,148'/><path d='M-20,210 Q120,180 260,210 T560,210'/><path d='M-20,272 Q140,242 280,272 T560,272'/><path d='M-20,326 Q120,294 260,326 T560,326'/></svg>");
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-position: right bottom;
+  pointer-events: none;
+  z-index: 0;
 }
-
-body.cover .kth-page-frame { display: none; }
-
-/* Reveal's built-in slide-number (configured in reveal.initialize) */
-.reveal .slide-number {
-  font-family: var(--heading-font);
-  font-size: 16px;
-  background: transparent;
-  color: color-mix(in srgb, var(--kth-blue) 70%, transparent);
-  right: 36px;
-  bottom: 24px;
-  padding: 0;
-}
-body.cover .slide-number { display: none; }
 
 /* ------------------------------------------------------------------------- */
-/* Highlight + callout boxes                                                 */
+/* Master slide chrome                                                        */
+/*                                                                            */
+/* Each section gets its own logo + footer injected by JS at init time        */
+/* (see example.html → injectMasterChrome). This keeps each PDF page          */
+/* self-contained in print mode — body-class-based chrome only reflects the   */
+/* CURRENT slide, which fails when reveal stacks all slides into one DOM.    */
+/* ------------------------------------------------------------------------- */
+
+/* Small black logo top-left (content slides, dividers) */
+.reveal section .kth-page-logo {
+  position: absolute;
+  top: 38px;
+  left: 60px;
+  height: 56px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Large black logo top-centre (cover slide) */
+.reveal section[data-state="cover"] .kth-cover-logo {
+  position: absolute;
+  top: 88px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 110px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* White logo centre (closing slide). Implemented as a CSS mask so any
+   modern browser (incl. Safari) renders it from the same blue-on-transparent
+   PNG that the rest of the templates use — no separate "white" file. */
+.reveal section[data-state="closing"] .kth-closing-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 360px;
+  height: 180px;
+  background: var(--kth-white);
+  -webkit-mask: url("../KTH_logo_RGB_bla.png") center / contain no-repeat;
+          mask: url("../KTH_logo_RGB_bla.png") center / contain no-repeat;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Footer — sky-blue strip across the bottom of content + divider slides:
+   left = author, centre = institute, right = page n / total. */
+.reveal section .kth-page-footer {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  bottom: 28px;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--heading-font);
+  font-size: 18px;
+  color: var(--kth-skyblue);
+  pointer-events: none;
+}
+
+.reveal section .kth-page-footer .right { font-variant-numeric: tabular-nums; }
+
+/* Reveal's own slide-number element — silenced; we have our own footer. */
+.reveal .slide-number,
+.reveal .progress { display: none !important; }
+
+/* ------------------------------------------------------------------------- */
+/* Slide-background colours per variant                                       */
+/* ------------------------------------------------------------------------- */
+.reveal .slide-background[data-state~="cover"]   { background: var(--kth-lightblue); }
+.reveal .slide-background[data-state~="divider"] { background: var(--kth-sand); }
+.reveal .slide-background[data-state~="closing"] { background: var(--kth-blue); }
+
+/* ------------------------------------------------------------------------- */
+/* Cover slide layout                                                         */
+/* Title centred mid-slide; line-pattern decorations top-left + bottom-right. */
+/* ------------------------------------------------------------------------- */
+.reveal section[data-state="cover"] {
+  text-align: center;
+  box-sizing: border-box;
+  padding: 380px 120px 180px !important;
+  min-height: 1080px;
+}
+
+.reveal section[data-state="cover"] h1 {
+  font-size: 116px;
+  color: var(--kth-navy);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.18em 0;
+  line-height: 1.05;
+}
+
+.reveal section[data-state="cover"] .subtitle {
+  font-family: var(--heading-font);
+  font-size: 44px;
+  font-weight: 400;
+  color: var(--kth-blue);
+  margin: 0 0 0.6em 0;
+}
+
+.reveal section[data-state="cover"] .meta {
+  font-family: var(--heading-font);
+  font-size: 26px;
+  color: var(--kth-blue);
+  font-weight: 500;
+  margin-top: 0.4em;
+}
+
+.reveal section[data-state="cover"] .meta strong {
+  color: var(--kth-navy);
+  font-weight: 700;
+}
+
+.reveal section[data-state="cover"] .doctype {
+  font-family: var(--heading-font);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--kth-skyblue);
+  margin-bottom: 1em;
+}
+
+/* Line-pattern decorations on cover (top-left + bottom-right) */
+.kth-lines-tl, .kth-lines-br { display: none; }
+body.cover   .kth-lines-tl,
+body.cover   .kth-lines-br,
+body.divider .kth-lines-br { display: block; }
+
+/* ------------------------------------------------------------------------- */
+/* Section divider                                                            */
+/* Sand background, navy title left-aligned just above centre, sky-blue       */
+/* line-pattern bottom-right.                                                 */
+/* ------------------------------------------------------------------------- */
+.reveal section[data-state="divider"] {
+  box-sizing: border-box;
+  padding: 360px 140px !important;
+  min-height: 1080px;
+}
+
+.reveal section[data-state="divider"] .eyebrow {
+  font-family: var(--heading-font);
+  font-size: 26px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--kth-skyblue);
+  font-weight: 600;
+  margin: 0 0 0.6em 0;
+}
+
+.reveal section[data-state="divider"] h2 {
+  color: var(--kth-navy);
+  font-size: 96px;
+  font-weight: 800;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  line-height: 1.05;
+}
+
+.reveal section[data-state="divider"] .lead {
+  color: var(--kth-blue);
+  font-family: var(--heading-font);
+  font-size: 36px;
+  font-weight: 400;
+  margin-top: 0.4em;
+  max-width: 80%;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* Closing slide                                                              */
+/* KTH-blue background, white logo centred (drawn via .kth-master-logo-end). */
+/* Optional caption below the logo.                                           */
+/* ------------------------------------------------------------------------- */
+.reveal section[data-state="closing"] {
+  text-align: center;
+  box-sizing: border-box;
+  /* Total padding-top + bottom + content must stay ≤ 1080px or reveal's
+     print-pdf code spreads the slide over two PDF pages. */
+  padding: 640px 0 220px !important;
+  min-height: 1080px;
+}
+
+.reveal section[data-state="closing"] h2 {
+  color: var(--kth-white);
+  font-size: 96px;
+  font-weight: 800;
+  border: 0;
+  padding: 0;
+  margin: 0 0 0.2em 0;
+}
+
+.reveal section[data-state="closing"] .lead {
+  color: color-mix(in srgb, var(--kth-white) 90%, transparent);
+  font-size: 32px;
+  font-family: var(--heading-font);
+  font-weight: 400;
+}
+
+.reveal section[data-state="closing"] a {
+  color: var(--kth-lightblue);
+  border-bottom-color: color-mix(in srgb, var(--kth-lightblue) 60%, transparent);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Content slide layout                                                       */
+/*                                                                            */
+/* Header band: small sky-blue section name ("eyebrow"), then navy frame      */
+/* title (h1). Body content sits below. Bottom padding clears the footer.    */
+/* ------------------------------------------------------------------------- */
+.reveal .slides section:not([data-state]) {
+  padding: 140px 80px 100px 80px;
+}
+
+.reveal section .section-name {
+  font-family: var(--heading-font);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--kth-skyblue);
+  margin: 0 0 0.4em 0;
+}
+
+/* H1 used as slide title on content slides */
+.reveal section h1 {
+  color: var(--kth-navy);
+  font-weight: 700;
+  margin: 0 0 0.5em 0;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Highlight + callout boxes                                                  */
 /* ------------------------------------------------------------------------- */
 .reveal .kthhl {
   font-weight: 700;
@@ -385,7 +407,7 @@ body.cover .slide-number { display: none; }
 
 .reveal .notebox {
   background: var(--kth-sand);
-  border-left: 6px solid color-mix(in srgb, var(--kth-blue) 60%, transparent);
+  border-left: 8px solid color-mix(in srgb, var(--kth-blue) 60%, transparent);
   padding: 0.7em 1em;
   margin: 0.6em 0;
   border-radius: 4px;
@@ -395,7 +417,7 @@ body.cover .slide-number { display: none; }
 
 .reveal .kthbox {
   background: var(--kth-lightblue);
-  border: 1.5px solid var(--kth-blue);
+  border-left: 8px solid var(--kth-blue);
   padding: 0.7em 1em;
   margin: 0.6em 0;
   border-radius: 4px;
@@ -404,7 +426,7 @@ body.cover .slide-number { display: none; }
 .reveal .kthbox > :last-child  { margin-bottom: 0; }
 
 /* ------------------------------------------------------------------------- */
-/* Two-column layout                                                         */
+/* Column layouts                                                             */
 /* ------------------------------------------------------------------------- */
 .reveal .cols-2 {
   display: grid;
@@ -421,24 +443,24 @@ body.cover .slide-number { display: none; }
 }
 
 /* ------------------------------------------------------------------------- */
-/* Palette swatch grid                                                       */
+/* Palette swatch grid                                                        */
 /* ------------------------------------------------------------------------- */
 .reveal .palette {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 14px;
-  margin: 0.6em 0;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin: 0.4em 0 0.6em;
 }
 
 .reveal .swatch {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  height: 110px;
-  padding: 10px 12px;
+  height: 140px;
+  padding: 14px 16px;
   border-radius: 6px;
   font-family: var(--heading-font);
-  font-size: 14px;
+  font-size: 18px;
   line-height: 1.2;
   color: var(--kth-white);
   position: relative;
@@ -450,40 +472,51 @@ body.cover .slide-number { display: none; }
 
 .reveal .swatch .name {
   font-weight: 700;
-  font-size: 15px;
+  font-size: 20px;
 }
 
 .reveal .swatch .hex {
   font-family: var(--mono-font);
-  font-size: 12px;
+  font-size: 15px;
   opacity: 0.85;
 }
 
 /* Functional palette: 5 rows × 3 cols (dark / mid / light) */
 .reveal .palette-fn {
   display: grid;
-  grid-template-columns: 110px repeat(3, 1fr);
-  gap: 10px 14px;
-  margin: 0.6em 0;
+  grid-template-columns: 140px repeat(3, 1fr);
+  gap: 12px 16px;
+  margin: 0.4em 0;
   font-family: var(--heading-font);
   align-items: center;
 }
 
 .reveal .palette-fn .row-label {
   font-weight: 600;
-  color: var(--kth-blue);
-  font-size: 18px;
+  color: var(--kth-navy);
+  font-size: 26px;
 }
 
-.reveal .palette-fn .swatch { height: 70px; }
+.reveal .palette-fn .swatch { height: 80px; }
+
+/* Staggered swatch entry */
+.reveal section.present .palette .swatch,
+.reveal section.present .palette-fn .swatch {
+  animation: kth-swatch-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes kth-swatch-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
 
 /* ------------------------------------------------------------------------- */
-/* Code blocks                                                               */
+/* Code blocks                                                                */
 /* ------------------------------------------------------------------------- */
 .reveal pre {
   font-family: var(--mono-font);
   font-size: 0.55em;
-  line-height: 1.35;
+  line-height: 1.4;
   background: var(--kth-sand);
   border-left: 4px solid var(--kth-blue);
   border-radius: 4px;
@@ -509,9 +542,7 @@ body.cover .slide-number { display: none; }
   font-size: 0.85em;
 }
 
-/* highlight.js token recolouring — KTH-tinted, works with default monokai
-   stylesheet stripped. We provide our own minimal palette that pairs with
-   the sand background. */
+/* highlight.js token recolouring */
 .reveal .hljs-keyword,
 .reveal .hljs-selector-tag,
 .reveal .hljs-built_in       { color: var(--kth-blue);       font-weight: 600; }
@@ -531,7 +562,7 @@ body.cover .slide-number { display: none; }
 .reveal .hljs-class .hljs-title    { color: var(--kth-yellow-dark); font-weight: 600; }
 
 /* ------------------------------------------------------------------------- */
-/* Tables                                                                    */
+/* Tables                                                                     */
 /* ------------------------------------------------------------------------- */
 .reveal table {
   font-size: 0.85em;
@@ -541,10 +572,10 @@ body.cover .slide-number { display: none; }
 .reveal table th {
   font-family: var(--heading-font);
   font-weight: 600;
-  color: var(--kth-blue);
+  color: var(--kth-navy);
   text-align: left;
   padding: 6px 10px;
-  border-bottom: 2px solid var(--kth-blue);
+  border-bottom: 2px solid var(--kth-navy);
 }
 .reveal table td {
   padding: 6px 10px;
@@ -552,11 +583,11 @@ body.cover .slide-number { display: none; }
 }
 
 /* ------------------------------------------------------------------------- */
-/* Block quotes                                                              */
+/* Block quotes                                                               */
 /* ------------------------------------------------------------------------- */
 .reveal blockquote {
   background: var(--kth-lightblue);
-  border-left: 6px solid var(--kth-blue);
+  border-left: 8px solid var(--kth-blue);
   padding: 0.7em 1em;
   margin: 0.6em 0;
   font-style: normal;
@@ -566,113 +597,26 @@ body.cover .slide-number { display: none; }
 }
 
 /* ------------------------------------------------------------------------- */
-/* Section divider slides — gradient via slide-background, content normal    */
-/* ------------------------------------------------------------------------- */
-.reveal .slide-background[data-state~="divider"] {
-  background:
-    radial-gradient(ellipse 70% 90% at 100% 50%, color-mix(in srgb, var(--kth-skyblue) 60%, transparent) 0%, transparent 70%),
-    linear-gradient(120deg, var(--kth-blue) 0%, var(--kth-navy) 100%);
-}
-
-.reveal section[data-state="divider"] {
-  box-sizing: border-box;
-  padding: 380px 100px !important;
-  min-height: 1080px;
-}
-
-.reveal section[data-state="divider"] h2 {
-  color: var(--kth-white);
-  font-size: 2.6em;
-  border: 0;
-  padding: 0;
-  margin: 0;
-}
-
-.reveal section[data-state="divider"] .eyebrow {
-  font-family: var(--heading-font);
-  font-size: 0.9em;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--kth-yellow);
-  font-weight: 600;
-  margin: 0 0 0.6em 0;
-}
-
-.reveal section[data-state="divider"] .lead {
-  color: color-mix(in srgb, var(--kth-white) 85%, transparent);
-  font-family: var(--heading-font);
-  font-size: 1.2em;
-  font-weight: 300;
-  margin-top: 1em;
-  max-width: 80%;
-}
-
-body.divider .kth-page-frame { display: none; }
-body.divider .slide-number   { color: color-mix(in srgb, var(--kth-white) 60%, transparent); }
-
-/* ------------------------------------------------------------------------- */
-/* Closing slide                                                             */
-/* ------------------------------------------------------------------------- */
-.reveal .slide-background[data-state~="closing"] {
-  background:
-    radial-gradient(ellipse 90% 70% at 50% 100%, color-mix(in srgb, var(--kth-blue) 90%, transparent) 0%, transparent 70%),
-    linear-gradient(180deg, var(--kth-navy) 0%, var(--kth-blue) 100%);
-}
-
-.reveal section[data-state="closing"] {
-  text-align: center;
-  box-sizing: border-box;
-  padding: 380px 0 !important;
-  min-height: 1080px;
-}
-
-.reveal section[data-state="closing"] h2 {
-  color: var(--kth-white);
-  font-size: 4em;
-  border: 0;
-  padding: 0;
-  margin: 0 0 0.2em 0;
-  text-align: center;
-}
-
-.reveal section[data-state="closing"] .lead {
-  color: color-mix(in srgb, var(--kth-white) 85%, transparent);
-  font-size: 1.2em;
-  text-align: center;
-}
-
-.reveal section[data-state="closing"] .accent-rule {
-  display: inline-block;
-  width: 140px;
-  height: 6px;
-  background: var(--kth-yellow);
-  margin: 0.8em auto;
-}
-
-body.closing .kth-page-frame { display: none; }
-body.closing .slide-number   { color: color-mix(in srgb, var(--kth-white) 60%, transparent); }
-
-/* ------------------------------------------------------------------------- */
-/* Big-stat / hero-number slide                                              */
+/* Big-stat / hero-number                                                     */
 /* ------------------------------------------------------------------------- */
 .reveal .big-stat {
   font-family: var(--heading-font);
-  font-size: 7em;
+  font-size: 180px;
   font-weight: 800;
-  color: var(--kth-blue);
+  color: var(--kth-navy);
   line-height: 1;
   letter-spacing: -0.02em;
 }
 .reveal .big-stat-label {
   font-family: var(--heading-font);
-  font-size: 1.2em;
+  font-size: 28px;
   color: var(--kth-brokenblack);
   font-weight: 500;
   margin-top: 0.4em;
 }
 
 /* ------------------------------------------------------------------------- */
-/* Iframe-embedded widgets                                                   */
+/* Embedded widgets                                                           */
 /* ------------------------------------------------------------------------- */
 .reveal iframe.widget {
   display: block;
@@ -685,32 +629,28 @@ body.closing .slide-number   { color: color-mix(in srgb, var(--kth-white) 60%, t
 }
 
 /* ------------------------------------------------------------------------- */
-/* Print-PDF mode tweaks                                                     */
-/* When reveal exports to PDF, <html> gets the .print-pdf class — disable    */
-/* infinite background animations so each printed slide gets a stable frame. */
+/* Print-PDF mode tweaks                                                      */
+/*                                                                            */
+/* Reveal's print stylesheet sets `padding: 0 !important; min-height: 1px;`   */
+/* on every section. Re-apply our cover/divider/closing layout under the      */
+/* matching .reveal-print selector with !important so the chrome holds.       */
 /* ------------------------------------------------------------------------- */
-.print-pdf .reveal .slide-background[data-state~="cover"],
-.print-pdf .reveal .slide-background[data-state~="divider"],
-.print-pdf .reveal .slide-background[data-state~="closing"] {
-  animation: none;
-  filter: none;
-}
-
-/* Reveal's print stylesheet sets `html.reveal-print .reveal .slides section
-   { padding:0 !important; min-height:1px; ... }`. Re-apply our cover/
-   divider/closing layout with equal-or-higher specificity *and* !important
-   so the slide chrome holds in print-pdf mode. */
 html.reveal-print .reveal .slides section[data-state="cover"] {
-  padding: 600px 80px 140px 80px !important;
+  padding: 380px 120px 180px !important;
   min-height: 1080px !important;
 }
 
 html.reveal-print .reveal .slides section[data-state="divider"] {
-  padding: 380px 100px !important;
+  padding: 360px 140px !important;
   min-height: 1080px !important;
 }
 
 html.reveal-print .reveal .slides section[data-state="closing"] {
-  padding: 380px 0 !important;
+  padding: 640px 0 220px !important;
+  min-height: 1080px !important;
+}
+
+html.reveal-print .reveal .slides section:not([data-state]) {
+  padding: 140px 80px 100px 80px !important;
   min-height: 1080px !important;
 }

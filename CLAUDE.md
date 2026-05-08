@@ -134,61 +134,83 @@ the `@page :first` margin trick).
 
 ## Reveal.js slide theme (`reveal/`)
 
-`reveal/kth-reveal.css` is the third toolchain — it mirrors the *same* KTH
-custom properties as `md-to-pdf.css` (`--kth-blue`, `--kth-yellow`,
-`--kth-sand`, …) so the palette is a single conceptual source of truth
-across all three flows. Heading sizes use the same 1.65× / 1.25× / 1.10× /
-1.0× ratios.
+`reveal/kth-reveal.css` is the third toolchain. The visual design follows
+the official KTH PowerPoint master, using the
+[kthpq](https://github.com/th-rtyf-re/kthpq) Beamer port as the reference
+since the .pptx itself is auth-walled on intra.kth.se. Mirrors the *same*
+KTH custom properties as `md-to-pdf.css` so the palette is a single
+conceptual source of truth across all three flows.
 
-A few things to know before editing:
+Layout per slide variant (set via `data-state` on `<section>`):
+
+| variant | bg | logo | footer | line motif |
+|---------|----|------|--------|-----------|
+| cover (default) | `--kth-lightblue` | large, top-centre | — | top-left + bottom-right |
+| (no state) | `--kth-brokenwhite` | small, top-left | author / institute / page | — |
+| divider | `--kth-sand` | small, top-left | (same) | bottom-right |
+| closing | `--kth-blue` | white, centred (CSS-masked) | — | — |
+
+Things to know before editing:
 
 - **CDN over npm.** `example.html` loads `reveal.js@5.x` from jsDelivr,
   Figtree from Google Fonts. Zero install — `open reveal/example.html`
-  works for users who clone the repo. We deliberately avoid a `package.json`
-  in the repo root to keep the onboarding story flat. `puppeteer` is only
-  pulled in transiently by the CI preview script (`build-preview.mjs`).
+  works. We deliberately avoid a `package.json` in the repo root to keep
+  the onboarding story flat. `puppeteer` is only pulled in transiently by
+  the CI preview script (`build-preview.mjs`).
 
-- **Cover / divider / closing layout.** These three slide types are flagged
-  by `data-state` on the `<section>`. The CSS uses **`padding-top` to push
-  content down**, not flex or absolute positioning, because reveal's
-  print-pdf stylesheet (`html.reveal-print .reveal .slides section`) sets
-  `padding: 0 !important; min-height: 1px;` and would override either of
-  those. We re-apply the layout under that selector with matching
-  specificity — see the `print-pdf` block at the bottom of `kth-reveal.css`.
+- **Sizing.** Base font size is `42px` and heading sizes are explicit pixel
+  values (`92 / 60 / 44 / 34px` for `h1`–`h4`) — presentation-scale, not
+  document-scale. To resize the whole deck, change `--r-main-font-size`
+  and the four `--r-heading*-size` values in one place.
 
-- **Slide-background gradients.** Reveal does *not* mirror `data-state` from
-  the `<section>` to the `.slide-background` it generates. The example deck
-  syncs this in JS via `slide.slideBackgroundElement`, so background
-  gradients targeted at `.slide-background[data-state~="cover"]` etc.
-  actually apply. If you add another gradient state, add the JS mirror call
-  too.
+- **Master chrome is injected per-section by JS** (see `injectMasterChrome`
+  in `example.html`), not via a single global overlay. This is essential
+  for print-pdf mode, where reveal stacks every slide into one DOM —
+  body-class-based chrome would only style the *current* slide and leave
+  the rest unstyled in the exported PDF.
 
-- **Print-PDF mode.** Append `?print-pdf` to the URL. Reveal's bundled
-  print stylesheet activates automatically (it's included in `reveal.css`
-  in v5.x). Background animations are disabled in print mode by the
-  `.print-pdf` CSS overrides at the bottom of `kth-reveal.css` so each
-  page gets a stable frame.
+- **Print-PDF padding override.** Reveal's print stylesheet sets
+  `padding: 0 !important; min-height: 1px;` on every section. Re-apply
+  the cover / divider / closing / content padding under
+  `html.reveal-print .reveal .slides section[data-state="…"]` (descendant
+  combinator — *not* `>`, because in print mode sections sit inside
+  `.pdf-page` wrappers).
+
+- **Don't let any single slide's content + padding exceed 1080px.**
+  Reveal's print code computes
+  `numberOfPages = Math.ceil(slide.scrollHeight / pageHeight)` and renders
+  each over-tall slide on a 2160px-tall PDF page (one filled, one blank).
+  The empty page in the exported PDF is the symptom. Slide 12 (iframe
+  widget) is the closest to the limit — keep iframe height ≤ ~580px when
+  it's the slide's main content.
+
+- **White logo on the closing slide is CSS-masked** from the existing
+  blue-on-transparent `KTH_logo_RGB_bla.png`. No separate "white" file.
+  This works in Safari (note the `-webkit-mask` prefix is included).
+
+- **Slide-background colours via JS mirror.** Reveal does *not* propagate
+  `data-state` from `<section>` to its generated `.slide-background` div.
+  The example deck mirrors it via `slide.slideBackgroundElement`, so
+  per-state background colours (`.slide-background[data-state~="cover"]`)
+  actually apply.
 
 - **Embedding widgets.** Use `<iframe class="widget" data-src="…">` (note
-  `data-src`, not `src`). Reveal injects `src` only when the slide is in
-  view, which keeps off-screen interactive widgets from running on the CPU.
-  Drop standalone HTML into `reveal/widgets/` — `orbit.html` is the
-  reference example. For a Claude Design widget, the same iframe pattern
-  applies; just paste the standalone export into `widgets/`.
+  `data-src`). Reveal sets `src` only when the slide is in view, keeping
+  off-screen iframes idle. Drop standalone HTML into `reveal/widgets/` —
+  `orbit.html` is the reference. Note: in `?print-pdf` exports, iframes
+  render blank because puppeteer doesn't load lazy iframes during the
+  print snapshot — that's expected; the live deck is the canonical
+  presentation, the PDF is for handouts.
 
-- **Master-slide chrome.** The small dark KTH logo bottom-left and the top
-  blue rule come from `<div class="kth-page-frame">` rendered once at the
-  top of `<div class="reveal">`. It's hidden via `body.cover` /
-  `body.divider` / `body.closing` body classes — those are toggled by
-  reveal automatically based on `data-state`.
+- **Author / institute footer text** is set via `data-kth-author` and
+  `data-kth-institute` attributes on the `.reveal` wrapper — read once at
+  init time by `injectMasterChrome`.
 
 - **CI preview.** `reveal/build-preview.mjs` spins up a local static
   server, drives Puppeteer to screenshot slide 1 (the cover) at
   1920×1080, and exports the full deck via `?print-pdf` to
-  `example-reveal.pdf`. It needs the script to run from the repo root so
-  that `../KTH_logo_RGB_bla.png` resolves; the GH workflow installs
-  puppeteer into `$RUNNER_TEMP/puppeteer-deps` and points `NODE_PATH`
-  at it.
+  `example-reveal.pdf`. The GH workflow installs puppeteer into
+  `$RUNNER_TEMP/puppeteer-deps` and points `NODE_PATH` at it.
 
 ## Consumer-example pattern
 
