@@ -1,0 +1,992 @@
+/* KTH reveal.js theme
+ * Mirrors the official KTH PowerPoint master (per the kthpq Beamer port)
+ * and stays visually in step with kth-document.cls / md-to-pdf.css.
+ *
+ * Design reference: KTH Grafisk manual v1.2 (2024) + th-rtyf-re/kthpq.
+ *
+ * Aspect:   16:9, 1920×1080
+ * Fonts:    Figtree throughout (headings + body)
+ * Sizing:   Base font 42px (presentation-scale). All heading sizes are
+ *           explicit pixel values so the hierarchy is stable.
+ *
+ * Slide variants (set via `data-state` on the <section>):
+ *   data-state="cover"     light-blue cover, KTH logo top-centre, navy title
+ *   data-state="divider"   sand background, KTH logo top-left, navy title
+ *   data-state="closing"   KTH-blue background, white logo centred
+ *   (default)              white content master, KTH logo top-left, footer
+ *
+ * Custom classes:
+ *   <span class="kthhl">word</span>             bold + KTH blue keyword
+ *   <div class="notebox">…</div>                sand callout box
+ *   <div class="kthbox">…</div>                 light-blue highlighted box
+ *   <div class="palette">…</div>                grid of .swatch chips
+ *   <div class="cols-2">…</div> / .cols-3       column layouts
+ *
+ * Content-slide chrome (`.kth-master`) renders the small KTH logo top-left,
+ * the section / frame-title header band, and the sky-blue footer with author
+ * / institute / page number — driven by data attributes on .reveal.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap');
+
+/* ------------------------------------------------------------------------- */
+/* KTH palette — same names/values as md-to-pdf.css                          */
+/* ------------------------------------------------------------------------- */
+:root {
+  --kth-white:        #FFFFFF;
+  --kth-sand:         #EBE5E0;
+  --kth-blue:         #004791;
+  --kth-skyblue:      #6298D2;
+  --kth-navy:         #000061;
+  --kth-lightblue:    #DEF0FF;
+  --kth-digitalblue:  #0029ED;
+  --kth-brokenblack:  #212121;
+  --kth-brokenwhite:  #FCFCFC;
+
+  --kth-green-dark:   #0D4A21;  --kth-green:   #4DA060;  --kth-green-light:   #C7EBBA;
+  --kth-teal-dark:    #1C434C;  --kth-teal:    #339C9C;  --kth-teal-light:    #B2E0E0;
+  --kth-brick-dark:   #78001A;  --kth-brick:   #E86A58;  --kth-brick-light:   #FFCCC4;
+  --kth-yellow-dark:  #A65900;  --kth-yellow:  #FFBE00;  --kth-yellow-light:  #FFF0B0;
+  --kth-gray-dark:    #323232;  --kth-gray:    #A5A5A5;  --kth-gray-light:    #E6E6E6;
+
+  --kth-accent: var(--kth-blue);
+  --kth-muted:  var(--kth-sand);
+
+  --heading-font: 'Figtree', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --body-font:    'Figtree', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* KTH's brand book doesn't specify a code font, so fall back to the
+     usual cross-platform monospace stack. SF Mono on recent macOS, Andale
+     Mono / Menlo / Monaco as further mac fallbacks, Consolas / Courier
+     for Windows, and the generic monospace keyword as a last resort. */
+  --mono-font:    'SF Mono', 'Andale Mono', Menlo, Monaco, Consolas,
+                  'Courier New', Courier, monospace;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Reveal.js variable overrides                                              */
+/* Heading sizes are explicit px multiples of the 42px base so the           */
+/* hierarchy is large and obvious (presentation-scale, not document-scale).  */
+/* ------------------------------------------------------------------------- */
+/* Letterbox: when the browser window is not 16:9, the area outside the slide
+   canvas is solid black. Reveal v5's .slide-background fills .backgrounds →
+   .reveal → viewport, so without this the slide-bg colour leaks into the
+   non-16:9 region. We constrain .reveal itself to a 16:9 box centred in the
+   viewport; everything outside is body-bg (#000). Print-pdf mode is opted
+   out because it stacks all slides into a tall canvas. */
+html, body, .reveal-viewport { background: #000; }
+body { margin: 0; overflow: hidden; }
+
+html:not(.reveal-print) .reveal {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width:  min(100vw, calc(100vh * 16 / 9)) !important;
+  height: min(100vh, calc(100vw * 9 / 16)) !important;
+}
+
+.reveal {
+  --r-background-color:   var(--kth-brokenwhite);
+
+  --r-main-font:          var(--body-font);
+  --r-main-font-size:     30px;
+  --r-main-color:         var(--kth-brokenblack);
+  --r-block-margin:       0.6em;
+
+  /* Reveal v5 only applies these variables under @media print — its base
+     stylesheet doesn't actually use them in screen mode, so we have to
+     wire them up ourselves (otherwise body text inherits the 16px html
+     default and ends up smaller than h4). */
+  font-family: var(--r-main-font);
+  font-size:   var(--r-main-font-size);
+  color:       var(--r-main-color);
+
+  --r-heading-font:           var(--heading-font);
+  --r-heading-color:          var(--kth-navy);
+  --r-heading-line-height:    1.12;
+  --r-heading-letter-spacing: normal;
+  --r-heading-text-transform: none;
+  --r-heading-text-shadow:    none;
+  --r-heading-font-weight:    700;
+
+  --r-heading1-size:          92px;  /* slide title (h1) */
+  --r-heading2-size:          60px;  /* section / panel (h2) */
+  --r-heading3-size:          44px;  /* subsection (h3) */
+  --r-heading4-size:          34px;  /* h4 — only slightly bigger than body */
+
+  --r-code-font:              var(--mono-font);
+
+  --r-link-color:             var(--kth-blue);
+  --r-link-color-dark:        #00305F;
+  --r-link-color-hover:       var(--kth-digitalblue);
+
+  --r-selection-background-color: var(--kth-lightblue);
+  --r-selection-color:            var(--kth-blue);
+}
+
+.reveal .slides { text-align: left; }
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+  font-family: var(--heading-font);
+  color: var(--kth-navy);
+  text-transform: none;
+  letter-spacing: normal;
+  font-weight: 700;
+  margin: 0 0 0.4em 0;
+  text-shadow: none;
+  line-height: 1.12;
+}
+
+.reveal h1 { font-size: var(--r-heading1-size); }
+.reveal h2 { font-size: var(--r-heading2-size); color: var(--kth-navy); }
+.reveal h3 { font-size: var(--r-heading3-size); color: var(--kth-blue); font-weight: 600; }
+.reveal h4 { font-size: var(--r-heading4-size); color: var(--kth-blue); font-weight: 500; }
+
+.reveal p, .reveal li, .reveal blockquote, .reveal td {
+  font-family: var(--body-font);
+}
+
+.reveal p { margin: 0 0 0.6em; }
+
+.reveal ul, .reveal ol { margin: 0.4em 0 0.8em; }
+.reveal li          { margin: 0.45em 0; }
+.reveal ul li::marker { color: var(--kth-navy); }
+.reveal ol li::marker { color: var(--kth-navy); font-weight: 600; }
+
+.reveal a, .reveal a:visited {
+  color: var(--kth-blue);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--kth-blue) 40%, transparent);
+}
+.reveal a:hover { color: var(--kth-digitalblue); }
+
+/* ------------------------------------------------------------------------- */
+/* Linjemönster — KTH's brand line pattern (Brand guidelines pp. 23-28).      */
+/*                                                                            */
+/* The 1920×1080 master pattern is split into corner-specific path groups by  */
+/* the chrome injector (example.html → KTH_PATTERN_PATHS). Each pattern       */
+/* instance gets only the paths for its <source> corner, so the visible motif */
+/* sits flush against the slide edges — no orphan strokes through the middle  */
+/* the way a clipped full-bleed render would have.                             */
+/*                                                                            */
+/* Author opt-in is a comma-separated list of <source> [transforms]:           */
+/*                                                                            */
+/*   data-pattern="tl, bl mirror-x"     (cover-style: TL + BL→BR)             */
+/*   data-pattern="tl, br"              (content-slide style: TL + BR)        */
+/*   data-pattern="full"                (the entire master at full bleed)     */
+/*   data-pattern                       (shorthand for "full")                */
+/*                                                                            */
+/* Tokens compose: rotate-180 | mirror-x | mirror-y. (90° / 270° aren't       */
+/* exposed because the master is 16:9; a quarter-turn would land in 9:16.)    */
+/* Stroke colour comes from `currentColor`, set via the colour class — so the */
+/* brand palette stays in CSS and there's no external SVG file to load.       */
+/* ------------------------------------------------------------------------- */
+/* Each section forms its own stacking context so the pattern at z-index:-1
+   stays inside the section (above the slide-bg sibling, below text content)
+   without interfering with reveal's own z-index choreography. */
+.reveal .slides section { isolation: isolate; }
+
+.reveal section .kth-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  color: var(--kth-skyblue);   /* default stroke colour (currentColor in <svg>) */
+}
+
+.reveal section .kth-pattern > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Transform composition via CSS vars so the rotate/mirror tokens combine.
+     The transform is applied to the SVG (not the wrapping div), so paths
+     flip/rotate within the slide's coordinate space — which is what makes
+     "bl mirror-x" land path 2 in the slide's BR with its straight sides
+     still flush against the slide edges. */
+  --kth-pattern-rotate: 0deg;
+  --kth-pattern-scale-x: 1;
+  --kth-pattern-scale-y: 1;
+  transform: rotate(var(--kth-pattern-rotate))
+             scale(var(--kth-pattern-scale-x), var(--kth-pattern-scale-y));
+  transform-origin: center;
+}
+
+.reveal section .kth-pattern.skyblue     { color: var(--kth-skyblue); }
+.reveal section .kth-pattern.blue        { color: var(--kth-blue); }
+.reveal section .kth-pattern.navy        { color: var(--kth-navy); }
+.reveal section .kth-pattern.lightblue   { color: var(--kth-lightblue); }
+.reveal section .kth-pattern.sand        { color: var(--kth-sand); }
+.reveal section .kth-pattern.white       { color: var(--kth-white); }
+.reveal section .kth-pattern.digitalblue { color: var(--kth-digitalblue); }
+
+.reveal section .kth-pattern.rotate-180 > svg { --kth-pattern-rotate: 180deg; }
+.reveal section .kth-pattern.mirror-x   > svg { --kth-pattern-scale-x: -1; }
+.reveal section .kth-pattern.mirror-y   > svg { --kth-pattern-scale-y: -1; }
+
+/* Both cover and closing now use the corner-only pattern (TL + BR-mirrored),
+   which never goes behind the centred logo, so neither slide needs the
+   p.27 safe-zone patch. The patch was previously here to mask a full-bleed
+   pattern on the closing slide. */
+
+
+/* ------------------------------------------------------------------------- */
+/* Master slide chrome                                                        */
+/*                                                                            */
+/* Each section gets its own logo + footer injected by JS at init time        */
+/* (see example.html → injectMasterChrome). This keeps each PDF page          */
+/* self-contained in print mode — body-class-based chrome only reflects the   */
+/* CURRENT slide, which fails when reveal stacks all slides into one DOM.    */
+/* ------------------------------------------------------------------------- */
+
+/* Black logo top-left (content slides, dividers). Top and left margins are
+   intentionally equal so the logo sits in a square corner safe area; the
+   logo grows downward when its size changes, never closer to the top edge. */
+.reveal section .kth-page-logo {
+  position: absolute;
+  top: 60px;
+  left: 60px;
+  height: 117px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Large black logo top-centre (cover slide) */
+.reveal section[data-state="cover"] .kth-cover-logo {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 400px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* White logo centre (closing slide). Same size and position as the cover's
+   logo so the two slides bookend each other visually. Rendered by inverting
+   the black PNG via `filter: brightness(0) invert(1)` — bulletproof in every
+   modern browser including Safari (where CSS-mask shorthand on raster
+   images is unreliable). No separate "white" image file required. */
+.reveal section[data-state="closing"] .kth-closing-logo {
+  position: absolute;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 400px;
+  width: auto;
+  filter: brightness(0) invert(1);
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Footer — sky-blue strip across the bottom of content + divider slides.
+   3-column grid (1fr / auto / 1fr) so the slide number sits centred on the
+   slide regardless of how long the left/right slots are. The right slot is
+   reserved for symmetry / future use (e.g. version, date). */
+.reveal section .kth-page-footer {
+  position: absolute;
+  left: 60px;
+  right: 60px;
+  bottom: 28px;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  font-family: var(--heading-font);
+  font-size: 18px;
+  color: var(--kth-skyblue);
+  pointer-events: none;
+}
+.reveal section .kth-page-footer .left   { text-align: left; }
+.reveal section .kth-page-footer .center { text-align: center; font-variant-numeric: tabular-nums; }
+.reveal section .kth-page-footer .right  { text-align: right; }
+
+/* Reveal's own slide-number element — silenced; we have our own footer. */
+.reveal .slide-number,
+.reveal .progress { display: none !important; }
+
+/* Reveal's slide-navigation controls — small, tinted skyblue, faded so they
+   don't compete visually with the slide content. Reveal sizes arrows in `em`
+   based on `.controls`'s font-size, so a single font-size override scales
+   the whole cluster. The arrows' fill comes from the parent's `color`
+   (reveal v5 doesn't read --r-controls-color anywhere — that variable is
+   defined in reveal's print stylesheet only — so we have to set `color`
+   directly here for the tint to take effect). */
+.reveal .controls {
+  font-size: 5px;
+  color: var(--kth-skyblue);
+  opacity: 0.6;
+  transition: opacity 0.15s ease-out;
+}
+.reveal .controls:hover { opacity: 1; }
+
+/* ------------------------------------------------------------------------- */
+/* Slide-background colours per variant                                       */
+/* Default content slides need an explicit fill — the letterbox rule above   */
+/* paints .reveal-viewport black, which would otherwise show through the     */
+/* (transparent) .slide-background of a section without a data-state.        */
+/* ------------------------------------------------------------------------- */
+.reveal .slide-background                        { background: var(--kth-brokenwhite); }
+.reveal .slide-background[data-state~="cover"]   { background: var(--kth-lightblue); }
+.reveal .slide-background[data-state~="divider"] { background: var(--kth-sand); }
+.reveal .slide-background[data-state~="closing"] { background: var(--kth-blue); }
+
+/* ------------------------------------------------------------------------- */
+/* Cover slide layout                                                         */
+/* Title centred mid-slide; full kth-pattern.svg layered behind via ::before. */
+/* ------------------------------------------------------------------------- */
+.reveal section[data-state="cover"] {
+  text-align: center;
+  box-sizing: border-box;
+  padding: 540px 120px 80px !important;
+  min-height: 1080px;
+}
+
+.reveal section[data-state="cover"] h1 {
+  font-size: 116px;
+  color: var(--kth-navy);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.18em 0;
+  line-height: 1.05;
+}
+
+.reveal section[data-state="cover"] .subtitle {
+  font-family: var(--heading-font);
+  font-size: 44px;
+  font-weight: 400;
+  color: var(--kth-blue);
+  margin: 0 0 0.6em 0;
+}
+
+.reveal section[data-state="cover"] .meta {
+  font-family: var(--heading-font);
+  font-size: 26px;
+  color: var(--kth-blue);
+  font-weight: 500;
+  margin-top: 0.4em;
+}
+
+.reveal section[data-state="cover"] .meta strong {
+  color: var(--kth-navy);
+  font-weight: 700;
+  display: block;
+  margin-bottom: 0.5em;
+}
+
+.reveal section[data-state="cover"] .doctype {
+  font-family: var(--heading-font);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--kth-skyblue);
+  margin-bottom: 1em;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Section divider                                                            */
+/* Sand background, navy title left-aligned just above centre, full           */
+/* kth-pattern.svg layered behind via ::before.                               */
+/* ------------------------------------------------------------------------- */
+.reveal section[data-state="divider"] {
+  box-sizing: border-box;
+  /* Top padding is generous so the title block sits below the master pattern's
+     upper-left curves (path 4 ends at y≈433, path 3 at y≈648 but only along
+     the left edge). Bottom padding leaves room before the BR corner pattern
+     (path 1 starts at y≈640 in the right half). */
+  padding: 480px 140px 280px !important;
+  min-height: 1080px;
+}
+
+.reveal section[data-state="divider"] .eyebrow {
+  font-family: var(--heading-font);
+  font-size: 26px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--kth-skyblue);
+  font-weight: 600;
+  margin: 0 0 0.6em 0;
+}
+
+.reveal section[data-state="divider"] h2 {
+  color: var(--kth-navy);
+  font-size: 96px;
+  font-weight: 800;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  line-height: 1.05;
+}
+
+.reveal section[data-state="divider"] .lead {
+  color: var(--kth-blue);
+  font-family: var(--heading-font);
+  font-size: 36px;
+  font-weight: 400;
+  margin-top: 0.4em;
+  max-width: 80%;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* Closing slide                                                              */
+/* KTH-blue background, white logo centred (drawn via .kth-master-logo-end). */
+/* Optional caption below the logo.                                           */
+/* ------------------------------------------------------------------------- */
+.reveal section[data-state="closing"] {
+  text-align: center;
+  box-sizing: border-box;
+  /* Match the cover slide: 540px top padding clears the 400px-tall logo
+     (top:80, ends y:480) with breathing room. Total padding + content
+     must stay ≤ 1080px or reveal's print-pdf code splits the slide
+     across two PDF pages. */
+  padding: 540px 0 80px !important;
+  min-height: 1080px;
+}
+
+.reveal section[data-state="closing"] h2 {
+  color: var(--kth-white);
+  font-size: 96px;
+  font-weight: 800;
+  border: 0;
+  padding: 0;
+  margin: 0 0 0.2em 0;
+}
+
+.reveal section[data-state="closing"] .lead {
+  color: color-mix(in srgb, var(--kth-white) 90%, transparent);
+  font-size: 32px;
+  font-family: var(--heading-font);
+  font-weight: 400;
+}
+
+.reveal section[data-state="closing"] a {
+  color: var(--kth-lightblue);
+  border-bottom-color: color-mix(in srgb, var(--kth-lightblue) 60%, transparent);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Content slide layout                                                       */
+/*                                                                            */
+/* Header band (y ≈ 60-180): KTH logo top-left, slide title (h1) at the same  */
+/* vertical position to the right of the logo, small section-name eyebrow in  */
+/* the upper-right corner. h1 and section-name are pulled out of flow so the  */
+/* body content area starts at padding-top with the full width available.    */
+/* The min-height pin keeps the footer at the slide's bottom edge regardless */
+/* of how short the body content is.                                          */
+/* ------------------------------------------------------------------------- */
+.reveal .slides section:not([data-state]) {
+  /* Side padding lines up with the centre of the logo: logo is at
+     left:60 with rendered width ~104 (the PNG is ~0.89:1 at h=117),
+     so the logo's vertical centre line is at x≈112. Same on the right
+     for symmetry. Top padding 240 leaves ~60 px of breathing room
+     between the slide title (h1 ends at y≈183) and the body content. */
+  padding: 240px 112px 100px 112px;
+  min-height: 1080px;
+  box-sizing: border-box;
+}
+
+/* Default flow style — used as-is on cover/divider where the eyebrow sits
+   in the title block. On content slides we override below with absolute
+   positioning so it tucks into the top-right corner. */
+.reveal section .section-name {
+  font-family: var(--heading-font);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--kth-skyblue);
+  margin: 0 0 0.4em 0;
+}
+
+/* Section-name on content slides: smaller, tucked tight into the upper-right
+   corner so it doesn't clash horizontally with a long slide title (h1). */
+.reveal section:not([data-state]) > .section-name {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  margin: 0;
+  font-size: 18px;
+}
+
+/* H1 used as slide title on content slides — pulled out of flow into the
+   header band, sitting beside the logo. The :first-of-type selector targets
+   only the slide title (h1 elements inside slide bodies, e.g. in the
+   heading-hierarchy demo, stay in flow). The logo SVG has viewBox 0 0 448
+   502 (aspect 0.892), so at height 117 it renders ~104px wide; left=224
+   puts the title 60px past the logo's right edge (the same 60px gap the
+   logo has from the slide's left edge). top=80 sits the title slightly
+   below the logo's top, optically aligned with the wordmark in the lower
+   part of the logo image. */
+.reveal section:not([data-state]) > h1:first-of-type {
+  position: absolute;
+  top: 80px;
+  left: 224px;
+  right: 100px;
+  margin: 0;
+}
+
+/* H1 used as slide title on content slides */
+.reveal section h1 {
+  color: var(--kth-navy);
+  font-weight: 700;
+  margin: 0 0 0.5em 0;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Highlight + callout boxes                                                  */
+/* ------------------------------------------------------------------------- */
+.reveal .kthhl {
+  font-weight: 700;
+  color: var(--kth-blue);
+}
+
+.reveal .notebox {
+  background: var(--kth-sand);
+  border-left: 8px solid color-mix(in srgb, var(--kth-blue) 60%, transparent);
+  padding: 0.7em 1em;
+  margin: 0.6em 0;
+  border-radius: 4px;
+}
+.reveal .notebox > :first-child { margin-top: 0; }
+.reveal .notebox > :last-child  { margin-bottom: 0; }
+
+.reveal .kthbox {
+  background: var(--kth-lightblue);
+  border-left: 8px solid var(--kth-blue);
+  padding: 0.7em 1em;
+  margin: 0.6em 0;
+  border-radius: 4px;
+}
+.reveal .kthbox > :first-child { margin-top: 0; }
+.reveal .kthbox > :last-child  { margin-bottom: 0; }
+
+/* ------------------------------------------------------------------------- */
+/* Column layouts                                                             */
+/* ------------------------------------------------------------------------- */
+.reveal .cols-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2em;
+  align-items: start;
+}
+.reveal .cols-2 > * { min-width: 0; }
+
+.reveal .cols-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.2em;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Palette swatch grid                                                        */
+/* ------------------------------------------------------------------------- */
+.reveal .palette {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin: 0.4em 0 0.6em;
+}
+
+.reveal .swatch {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 140px;
+  padding: 14px 16px;
+  border-radius: 6px;
+  font-family: var(--heading-font);
+  font-size: 18px;
+  line-height: 1.2;
+  color: var(--kth-white);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+.reveal .swatch.light { color: var(--kth-brokenblack); }
+
+.reveal .swatch .name {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.reveal .swatch .hex {
+  font-family: var(--mono-font);
+  font-size: 15px;
+  opacity: 0.85;
+}
+
+/* Functional palette: 5 rows × 3 cols (dark / mid / light) */
+.reveal .palette-fn {
+  display: grid;
+  grid-template-columns: 140px repeat(3, 1fr);
+  gap: 12px 16px;
+  margin: 0.4em 0;
+  font-family: var(--heading-font);
+  align-items: center;
+}
+
+.reveal .palette-fn .row-label {
+  font-weight: 600;
+  color: var(--kth-navy);
+  font-size: 26px;
+}
+
+.reveal .palette-fn .swatch { height: 80px; }
+
+/* Compact variant — used when the functional palette shares a slide with
+   the primary palette so both fit inside the 850px content budget. */
+.reveal .palette-fn.compact { gap: 8px 14px; grid-template-columns: 100px repeat(3, 1fr); }
+.reveal .palette-fn.compact .swatch { height: 56px; padding: 8px 12px; }
+.reveal .palette-fn.compact .swatch .name { font-size: 16px; }
+.reveal .palette-fn.compact .swatch .hex  { font-size: 13px; }
+.reveal .palette-fn.compact .row-label    { font-size: 20px; }
+
+.reveal .palette.compact { grid-template-columns: repeat(8, 1fr); gap: 12px; }
+.reveal .palette.compact .swatch { height: 96px; padding: 10px 12px; }
+
+/* Staggered swatch entry */
+.reveal section.present .palette .swatch,
+.reveal section.present .palette-fn .swatch {
+  animation: kth-swatch-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes kth-swatch-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ------------------------------------------------------------------------- */
+/* Code blocks                                                                */
+/* ------------------------------------------------------------------------- */
+.reveal pre {
+  font-family: var(--mono-font);
+  font-size: 1em;
+  line-height: 1.4;
+  background: var(--kth-sand);
+  border-left: 4px solid var(--kth-blue);
+  border-radius: 4px;
+  margin: 0.6em auto;
+  box-shadow: none;
+  width: 75%;
+  /* position:relative gives reveal's highlight plugin a containing block at
+     the pre's location — without it the gradual-highlight overlay falls
+     back to the section (which is positioned absolute at 0,0) and renders
+     in the slide's top-left corner instead of on top of the code box. */
+  position: relative;
+}
+
+.reveal pre code {
+  display: block;
+  padding: 0.9em 1.1em;
+  background: transparent;
+  color: var(--kth-brokenblack);
+  max-height: none;
+  /* !important here covers the case where reveal-highlight (or a hljs
+     theme bundled with the plugin) injects font-family on .hljs. We want
+     code blocks to be monospace regardless. */
+  font-family: var(--mono-font) !important;
+}
+.reveal pre code .hljs,
+.reveal pre code span {
+  font-family: var(--mono-font) !important;
+}
+
+/* reveal-highlight step-through.
+   The plugin clones the original <code> once per step and appends each
+   clone as a sibling inside <pre class="code-wrapper">. Without help:
+   (1) clones pile up as block siblings — only step 0 sits inside the
+       visible pre, every later step clone sits below it (out of view).
+   (2) Even with the clones absolutely-positioned over the original, the
+       clones' default `background: transparent` (from .reveal pre code)
+       means the user sees the *original* showing through — and the
+       original is always at step 0 with no .has-highlights, so every
+       line stays at full opacity and the fade effect is invisible.
+   Fix: stack the clones over the original via inset:0, AND give them
+   the pre's sand background so they opaquely mask the original when
+   reveal flips them to opacity 1. */
+.reveal pre.code-wrapper { position: relative; }
+.reveal pre.code-wrapper > code:not(:first-child) {
+  position: absolute;
+  inset: 0;
+  background: var(--kth-sand);
+  border-radius: 4px;
+}
+
+/* The plugin adds .has-highlights to <code> and .highlight-line to the
+   active <tr>'s, but ships no CSS for the visual effect. We fade
+   non-highlighted lines so the active step pops, without drawing a
+   selection-style background on the active line itself.
+
+   Important: fade the <tr> only — NOT the inner <div class="hljs-ln-line">.
+   The plugin marks the active <tr> with .highlight-line but the inner
+   line div doesn't get that class. If we also targeted .hljs-ln-line,
+   the active row's outer tr would be at opacity 1 but the inner line
+   div would still match `.hljs-ln-line:not(.highlight-line)` and fade
+   to 0.3 — making the "highlighted" line just as muted as the others.
+   By scoping to <tr> the inner line div inherits opacity from its
+   parent row, which is exactly what we want. */
+.reveal pre code.has-highlights tr:not(.highlight-line) {
+  opacity: 0.3;
+  transition: opacity 0.5s ease;
+}
+
+.reveal :not(pre) > code {
+  font-family: var(--mono-font);
+  background: var(--kth-gray-light);
+  color: var(--kth-blue);
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.85em;
+}
+
+/* highlight.js token recolouring */
+.reveal .hljs-keyword,
+.reveal .hljs-selector-tag,
+.reveal .hljs-built_in       { color: var(--kth-blue);       font-weight: 600; }
+.reveal .hljs-string,
+.reveal .hljs-attr           { color: var(--kth-green-dark); }
+.reveal .hljs-number,
+.reveal .hljs-literal         { color: var(--kth-brick-dark); }
+.reveal .hljs-comment,
+.reveal .hljs-quote           { color: color-mix(in srgb, var(--kth-brokenblack) 50%, transparent); font-style: italic; }
+.reveal .hljs-title,
+.reveal .hljs-section,
+.reveal .hljs-name,
+.reveal .hljs-function .hljs-title { color: var(--kth-navy);  font-weight: 600; }
+.reveal .hljs-variable,
+.reveal .hljs-template-variable    { color: var(--kth-teal-dark); }
+.reveal .hljs-type,
+.reveal .hljs-class .hljs-title    { color: var(--kth-yellow-dark); font-weight: 600; }
+
+/* ------------------------------------------------------------------------- */
+/* Tables                                                                     */
+/* ------------------------------------------------------------------------- */
+.reveal table {
+  font-size: 0.85em;
+  border-collapse: collapse;
+  margin: 0.6em 0;
+}
+.reveal table th {
+  font-family: var(--heading-font);
+  font-weight: 600;
+  color: var(--kth-navy);
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 2px solid var(--kth-navy);
+}
+.reveal table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--kth-gray-light);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Block quotes                                                               */
+/* ------------------------------------------------------------------------- */
+.reveal blockquote {
+  background: var(--kth-lightblue);
+  border-left: 8px solid var(--kth-blue);
+  padding: 0.7em 1em;
+  margin: 0.6em 0;
+  font-style: normal;
+  width: 100%;
+  box-shadow: none;
+  border-radius: 4px;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Big-stat / hero-number                                                     */
+/* ------------------------------------------------------------------------- */
+.reveal .big-stat {
+  font-family: var(--heading-font);
+  font-size: 180px;
+  font-weight: 800;
+  color: var(--kth-navy);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.reveal .big-stat-label {
+  font-family: var(--heading-font);
+  font-size: 28px;
+  color: var(--kth-brokenblack);
+  font-weight: 500;
+  margin-top: 0.4em;
+}
+
+/* Spotlight stage — used by the auto-animate "By the numbers" sequence.
+   Two-row CSS grid: row 1 holds the four row-stats (one per column,
+   anchored to the top of the body area); row 2 holds the spotlighted
+   stat (spanning all four columns and centred via justify-self).
+   Crucially the matched data-id elements have NO transform and NO
+   absolute positioning — the only thing that differs between the
+   spotlight and row layouts is which grid cell the element occupies.
+   That makes reveal v5 auto-animate's bounding-rect measurement accurate
+   in both directions: forward (spotlight → row) and back (row →
+   spotlight) animate from exactly where the user sees the element. */
+.reveal .stats-stage {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-rows: 200px auto;
+  row-gap: 20px;
+  column-gap: 2.4em;
+}
+
+/* Both row and spotlight stats are content-sized via `width: max-content`
+   and centred in their grid cell with `justify-self: center`. That keeps
+   the bounding-rect aspect ratio of each stat the SAME between its
+   spotlight and row positions, which is what auto-animate needs in order
+   to interpolate with a uniform scale. (Without max-content, .stat-row's
+   rect would fill the entire grid column — fine for "14 000" which
+   nearly fills it, but for the single character "5" the rect would be
+   3× wider than the spotlight rect, so auto-animate's scaleX wouldn't
+   match scaleY and the digit would distort during the morph.) */
+.reveal .stats-stage .stat-row {
+  grid-row: 1;
+  width: max-content;
+  justify-self: center;
+  text-align: center;
+}
+.reveal .stats-stage .stat-row[data-id="stat-1"] { grid-column: 1; }
+.reveal .stats-stage .stat-row[data-id="stat-2"] { grid-column: 2; }
+.reveal .stats-stage .stat-row[data-id="stat-3"] { grid-column: 3; }
+.reveal .stats-stage .stat-row[data-id="stat-4"] { grid-column: 4; }
+
+.reveal .stats-stage .stat-spotlight {
+  grid-row: 2;
+  grid-column: 1 / -1;          /* span all four columns */
+  justify-self: center;          /* centre on the slide, content-sized */
+  text-align: center;
+}
+
+/* Keep "14 000" (and similar thin-space-separated numerals) on one line
+   in the row position — &thinsp; is a soft break opportunity per Unicode
+   and column 1 is only just wide enough for the rendered glyphs. */
+.reveal .stats-stage .big-stat { white-space: nowrap; }
+
+/* Big-stat / label sizes — the label/big ratio is held the same in both
+   states (1:5) so the container's aspect ratio doesn't change between
+   spotlight and row, and auto-animate scales uniformly across X and Y. */
+.reveal .stats-stage .stat-spotlight .big-stat       { font-size: 260px; }
+.reveal .stats-stage .stat-spotlight .big-stat-label { font-size: 52px; }
+.reveal .stats-stage .stat-row .big-stat       { font-size: 130px; }
+.reveal .stats-stage .stat-row .big-stat-label { font-size: 26px; }
+
+/* ------------------------------------------------------------------------- */
+/* Inline SVG animation — LHC pp-collision sketch                            */
+/* Two protons enter from left/right, collide at centre, scatter out as a    */
+/* spray of partons. Drawn via stroke-dashoffset; pathLength=1 normalises    */
+/* the dash length so the same keyframes work for every line regardless of   */
+/* its actual length.                                                         */
+/* ------------------------------------------------------------------------- */
+.lhc-figure {
+  width: 100%;
+  height: 460px;
+  background: var(--kth-sand);
+  border-radius: 6px;
+  display: block;
+}
+
+.lhc-figure .track {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+/* Incoming protons — KTH-blue, same stroke-width as outgoing, drawn at
+   constant speed (linear). They draw in 0.25s (8.33% of the 3s cycle —
+   2× faster than the previous step) and fade out at the moment of
+   collision. */
+.lhc-figure .track.in  {
+  stroke: var(--kth-blue);
+  stroke-width: 3;
+  animation: lhc-in 3s linear infinite;
+}
+/* Outgoing tracks keep their previous draw rate (60% of cycle = 1.8s) and
+   ease-out feel, but now start the instant the incoming protons meet —
+   no gap between collision and the spray of secondaries. The stroke is
+   set per-track via a gradient (transparent at the vertex, opaque at the
+   leading edge) so the trail fades behind the particle as it advances. */
+.lhc-figure .track.out {
+  stroke-width: 3;
+  animation: lhc-out 3s ease-out infinite;
+}
+.lhc-figure .burst {
+  fill: var(--kth-yellow);
+  opacity: 0;
+  animation: lhc-burst 3s ease-in-out infinite;
+}
+
+@keyframes lhc-in {
+  0%           { stroke-dashoffset: 1; opacity: 1; }
+  8.33%        { stroke-dashoffset: 0; opacity: 1; }
+  14%, 100%    { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes lhc-out {
+  0%, 8.33%    { stroke-dashoffset: 1; opacity: 1; }
+  68.33%, 95%  { stroke-dashoffset: 0; opacity: 1; }
+  100%         { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes lhc-burst {
+  0%, 5%       { r: 0;  opacity: 0; }
+  8.33%        { r: 25; opacity: 1; }
+  14%          { r: 50; opacity: 0; }
+  100%         { r: 0;  opacity: 0; }
+}
+
+/* Vertical-centre helper — fills the body content area of a content slide
+   (1080 - 200 padding-top - 100 padding-bottom = 780) and centres a single
+   child inside it. Used on the iframe-widget slide. */
+.reveal section .vcenter {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  min-height: 780px;
+}
+
+/* ------------------------------------------------------------------------- */
+/* Embedded widgets                                                           */
+/* ------------------------------------------------------------------------- */
+.reveal iframe.widget {
+  display: block;
+  width: 100%;
+  height: 600px;
+  border: 1.5px solid var(--kth-gray-light);
+  border-radius: 6px;
+  background: var(--kth-white);
+  box-shadow: 0 2px 12px rgba(0, 71, 145, 0.06);
+}
+
+/* ------------------------------------------------------------------------- */
+/* Print-PDF mode tweaks                                                      */
+/*                                                                            */
+/* Reveal's print stylesheet sets `padding: 0 !important; min-height: 1px;`   */
+/* on every section. Re-apply our cover/divider/closing layout under the      */
+/* matching .reveal-print selector with !important so the chrome holds.       */
+/* ------------------------------------------------------------------------- */
+html.reveal-print .reveal .slides section[data-state="cover"] {
+  padding: 540px 120px 80px !important;
+  min-height: 1080px !important;
+}
+
+html.reveal-print .reveal .slides section[data-state="divider"] {
+  padding: 480px 140px 280px !important;
+  min-height: 1080px !important;
+}
+
+html.reveal-print .reveal .slides section[data-state="closing"] {
+  padding: 540px 0 80px !important;
+  min-height: 1080px !important;
+}
+
+html.reveal-print .reveal .slides section:not([data-state]) {
+  padding: 240px 112px 100px 112px !important;
+  min-height: 1080px !important;
+  box-sizing: border-box !important;
+}

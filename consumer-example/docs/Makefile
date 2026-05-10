@@ -45,7 +45,7 @@ tex: $(TEX_PDFS)
 # ----- LaTeX -------------------------------------------------------------- #
 # Run the selected LaTeX engine twice for cross-references / TOC. -jobname controls the
 # output stem so it doesn't clash with the markdown build.
-%-tex.pdf: %.tex $(TEMPLATES)/kth-document.cls $(TEMPLATES)/KTH_logo_RGB_bla.png
+%-tex.pdf: %.tex $(TEMPLATES)/kth-document.cls $(TEMPLATES)/KTH_logo_RGB_bla.pdf
 	TEXINPUTS=$(TEXINPUTS_PREFIX) $(LATEX) -interaction=nonstopmode -jobname=$*-tex $<
 	TEXINPUTS=$(TEXINPUTS_PREFIX) $(LATEX) -interaction=nonstopmode -jobname=$*-tex $<
 

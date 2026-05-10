@@ -4,7 +4,7 @@
  *
  * Fonts:    Figtree (headings, from Google Fonts) + Georgia (body)
  * Palette:  KTH primary + functional colours (CSS custom properties below)
- * Logo:     place ![](KTH_logo_RGB_bla.png) as the FIRST line of your .md
+ * Logo:     place ![](KTH_logo_RGB_bla.svg) as the FIRST line of your .md
  *           — it will be sized to 2cm tall like the LaTeX title block.
  *
  * Custom classes (use inline HTML in your markdown):

@@ -1,20 +1,26 @@
 # kth-document — KTH Document Templates
 
-Professional KTH document templates for **LaTeX** and **Markdown**, both
-implementing the
+Professional KTH document templates for **LaTeX**, **Markdown**, and
+**reveal.js slide decks**, all implementing the
 [KTH Graphical Profile](https://intra.kth.se/administration/kommunikation/varumarke/grafiskprofil)
 (Grafisk manual v1.2, 2024). Use them for project descriptions, 
-memos, as a git submodule for package documentation, etc.
+memos, slide decks, as a git submodule for package documentation, etc.
 
 ## Previews
 
-| LaTeX (`example.tex` → lualatex) | Markdown (`example.md` → md-to-pdf) |
-|----------------------------------|--------------------------------------|
-| ![](docs/preview/example-tex.png) | ![](docs/preview/example-md.png) |
+| LaTeX (`example.tex` → lualatex) | Markdown (`example.md` → md-to-pdf) | Slides (`reveal/example.html`) |
+|----------------------------------|--------------------------------------|--------------------------------|
+| ![](docs/preview/example-tex.png) | ![](docs/preview/example-md.png) | **[▶ Live deck][live]** |
 
-The previews above are regenerated automatically by CI on every push to
-`main`, so they always reflect the current state of the templates. PDFs
-from each CI run are available as workflow artefacts.
+[live]: https://cohm.github.io/kth-doc-templates/reveal/example.html
+
+The LaTeX and Markdown previews above are regenerated automatically by
+CI on every push to `main`, so they always reflect the current state of
+the templates. The reveal deck is served live via GitHub Pages
+([link][live]) — open it in your browser to interact with the
+animations, transitions, and embedded widgets. PDFs from each CI run
+(including a static print-pdf export of the deck) are available as
+workflow artefacts.
 
 ## Files
 
@@ -22,8 +28,12 @@ from each CI run are available as workflow artefacts.
 |------|---------|
 | `kth-document.cls` | The LaTeX document class — copy this (and the logo) into your project |
 | `md-to-pdf.{json,css}` | Markdown theme for [md-to-pdf](https://github.com/simonhaenisch/md-to-pdf) |
+| `reveal/kth-reveal.css` | reveal.js theme — used by `reveal/example.html` |
+| `reveal/example.html` | Annotated reveal.js example deck / starting point |
+| `reveal/widgets/` | Drop-in interactive widgets embedded via `<iframe>` |
 | `example.tex`, `example.md` | Fully annotated examples / starting points |
-| `KTH_logo_RGB_bla.png` | KTH logo (blue, PNG) — place next to your source file |
+| `KTH_logo_RGB_bla.svg` | KTH logo (blue, vector) — for HTML and Markdown |
+| `KTH_logo_RGB_bla.pdf` | KTH logo (blue, vector) — for LaTeX |
 | `consumer-example/` | Recommended layout for using this repo as a git submodule |
 
 ## Quick start (LaTeX)
@@ -66,12 +76,56 @@ md-to-pdf report.md \
   --document-title "My Document"
 ```
 
-Place `![](KTH_logo_RGB_bla.png)` as the first line of your `.md` to use the
+Place `![](KTH_logo_RGB_bla.svg)` as the first line of your `.md` to use the
 KTH logo as the title-block image. Use `<p class="subtitle">…</p>` and
 `<p class="doctype">…</p>` for the metadata lines below the title, and
 `<div class="notebox">…</div>` / `<span class="kthhl">…</span>` for the
 sand-coloured note boxes and inline keyword highlights. Plain blockquotes
 (`> …`) render as the light-blue summary boxes.
+
+## Quick start (Slides)
+
+`reveal/example.html` is a self-contained [reveal.js](https://revealjs.com)
+deck with the KTH theme — open it directly in a browser:
+
+```bash
+open reveal/example.html       # macOS, double-click also works
+```
+
+reveal.js itself loads from a CDN, so there's nothing to install. To export
+the deck as PDF, append `?print-pdf` to the URL and use the browser's "Save
+as PDF" with paper size 1920×1080, no margins, and "Background graphics"
+turned on. CI does this automatically (see workflow artefacts).
+
+The slide theme follows the official KTH PowerPoint master (per the
+[kthpq](https://github.com/th-rtyf-re/kthpq) Beamer port): light-blue cover
+with KTH logo top-centre and the wave-line *Linjemonster* corner motif,
+white content slides with logo top-left and a sky-blue footer, sand-coloured
+section dividers, and a KTH-blue closing slide. Figtree throughout. The
+same custom-property names from `md-to-pdf.css` (`--kth-blue`, `--kth-navy`,
+`--kth-sand`, …) are exposed in the slide theme so palette choices stay in
+sync across the three template flows.
+
+Set the deck-wide author and institute via attributes on the `.reveal`
+wrapper — they appear in the footer of every content slide:
+
+```html
+<div class="reveal"
+     data-kth-author="Firstname Lastname"
+     data-kth-institute="School of Engineering Sciences (SCI), KTH">
+```
+
+Authoring cheatsheet:
+
+- `<section data-state="cover">` — light-blue cover with logo top-centre
+- `<section data-state="divider">` — sand divider with line motif
+- `<section data-state="closing">` — KTH-blue end slide, white logo centred
+- `<p class="section-name">…</p>` — sky-blue eyebrow above a slide title
+- `<div class="palette">` / `.palette-fn` — animated swatch grids
+- `<div class="cols-2">` — two-column layout
+- `<iframe class="widget" data-src="widgets/foo.html">` — embed an
+  interactive widget (Claude Design widget, custom web app, …); reveal
+  pauses off-screen iframes to keep CPU cool
 
 ## Use as a git submodule
 

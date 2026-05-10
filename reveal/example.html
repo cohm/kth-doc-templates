@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KTH reveal.js template — Example deck</title>
+
+  <!--
+    KTH reveal.js example deck.
+
+    Compile / preview:
+      Just open this file in a browser:    open reveal/example.html
+      Or, while iterating with widgets:    npx http-server -p 8080 .
+                                           → http://localhost:8080/reveal/example.html
+      Print to PDF:                        append ?print-pdf, then ⌘/Ctrl+P → Save as PDF
+                                           (1920×1080 paper, no margins, "Background graphics" on)
+
+    Authoring cheatsheet:
+      <section data-state="cover">          KTH-light-blue cover, navy title centred
+      <section data-state="divider">        sand divider with sky-blue line motif
+      <section data-state="closing">        KTH-blue end slide, white logo centred
+      (no data-state)                       white content master, logo top-left, footer
+
+      data-pattern="tl, bl mirror-x"         line pattern (linjemönster) — comma-separated
+                                             list of <source> [transforms] items.
+                                             source: tl|tr|bl|br|full
+                                                     (which corner of the master to render)
+                                             transforms (composable, space-separated):
+                                                     rotate-180 | mirror-x | mirror-y
+                                             E.g. "tl, br"        (TL + BR natural corners)
+                                                  "tl, bl mirror-x" (cover-style: TL + BR
+                                                                     mirrored from BL)
+                                                  "full"          (full-bleed master)
+                                                  data-pattern    (boolean = "full")
+        data-pattern-color="skyblue"         stroke colour: skyblue|blue|navy|lightblue|
+                                                            sand|white|digitalblue
+
+      .section-name           sky-blue uppercase eyebrow above the slide title
+      <span class="kthhl">    inline keyword highlight
+      .notebox / .kthbox      sand / light-blue callouts
+      .palette / .palette-fn  swatch grids
+      .cols-2 / .cols-3       column layouts
+
+      <iframe class="widget" data-src="…">  embed an interactive widget
+                                            (data-src so reveal pauses off-screen)
+
+    Per-slide options worth knowing about:
+      data-transition="fade|slide|convex|concave|zoom|none"
+      data-auto-animate                     morph matched elements between siblings
+      class="fragment"                      stagger element reveal within a slide
+  -->
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css">
+
+  <!-- Figtree as a real <link> so it loads via the browser's font pipeline
+       (more reliable than the @import in kth-reveal.css over file://). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+
+  <!-- KaTeX for inline LaTeX math via $…$ delimiters (auto-rendered after
+       Reveal initialises so all slides — including off-screen ones — get
+       processed in a single pass). -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <link rel="stylesheet" href="kth-reveal.css">
+</head>
+<body>
+
+<div class="reveal"
+     data-kth-author="Firstname Lastname"
+     data-kth-institute="School of Engineering Sciences (SCI), KTH"
+     data-kth-affiliation-short="SCI">
+
+  <!--
+    Master chrome (small KTH logo top-left, large logo top-centre on the
+    cover, white logo centred on the closing slide, sky-blue footer) is
+    injected per-section by injectMasterChrome() at the bottom of this
+    file. Per-section is necessary because reveal stacks every slide into
+    one DOM in print-pdf mode, where global body-class-based chrome only
+    reflects the *current* slide and breaks for the rest.
+
+    Set the deck-wide author / institute via the data-kth-author and
+    data-kth-institute attributes on .reveal above.
+  -->
+
+  <div class="slides">
+
+    <!-- ==================================================================
+         1. Cover — light-blue, KTH logo top-centre, navy title centred
+         ================================================================== -->
+    <section data-state="cover" data-transition="fade"
+             data-pattern="tl, bl mirror-x" data-pattern-color="skyblue">
+      <p class="doctype">Activity Report · 2026</p>
+      <h1>Project&nbsp;Title</h1>
+      <p class="subtitle">A short, informative subtitle that<br>spans up to two lines</p>
+      <p class="meta">
+        <strong>Firstname Lastname</strong>
+        School of Engineering Sciences (SCI), KTH &middot; May 2026 &middot; v1.0
+      </p>
+    </section>
+
+    <!-- ==================================================================
+         2. Heading hierarchy — proves the visual ratios match LaTeX/Markdown
+         ================================================================== -->
+    <section>
+      <p class="section-name">Identity · Typography</p>
+      <h1>Heading hierarchy</h1>
+
+      <p>Heading sizes are explicit at presentation scale, with strong contrast between levels:</p>
+
+      <h1 style="margin-top: 0.6em;" class="fragment fade-in">H1 — slide title (92&nbsp;px)</h1>
+      <h2 style="margin-top: 0.6em;" class="fragment fade-in">H2 — section heading (60&nbsp;px)</h2>
+      <h3 style="margin-top: 0.5em;" class="fragment fade-in">H3 — subsection (44&nbsp;px)</h3>
+      <h4 style="margin-top: 0.4em;" class="fragment fade-in">H4 — emphasis (34&nbsp;px)</h4>
+
+      <p class="fragment fade-in" style="margin-top: 1em; font-size: 0.85em; color: var(--kth-gray-dark);">
+        All sizes scale from <code>--r-main-font-size: 30px</code>. Headings and
+        body both use <span class="kthhl">Figtree</span>.
+      </p>
+    </section>
+
+    <!-- ==================================================================
+         3. Section divider — Identity
+         ================================================================== -->
+    <section data-state="divider" data-transition="convex"
+             data-pattern="full" data-pattern-color="skyblue">
+      <p class="eyebrow">Part 1 of 2</p>
+      <h2>Identity</h2>
+      <p class="lead">Colour, type, and layout from the KTH Grafisk manual&nbsp;v1.2 (2024).</p>
+    </section>
+
+    <!-- ==================================================================
+         4. Palette — primary + functional on one slide
+         ================================================================== -->
+    <section>
+      <p class="section-name">Identity · Colour</p>
+      <h1>Palette</h1>
+
+      <h3 style="margin: 0.2em 0 0.3em;">Primary</h3>
+      <div class="palette compact" id="palette-primary">
+        <div class="swatch" style="background: var(--kth-blue);">
+          <div class="name">kthblue</div><div class="hex">#004791</div>
+        </div>
+        <div class="swatch" style="background: var(--kth-skyblue);">
+          <div class="name">kthskyblue</div><div class="hex">#6298D2</div>
+        </div>
+        <div class="swatch" style="background: var(--kth-navy);">
+          <div class="name">kthnavy</div><div class="hex">#000061</div>
+        </div>
+        <div class="swatch light" style="background: var(--kth-lightblue);">
+          <div class="name">kthlightblue</div><div class="hex">#DEF0FF</div>
+        </div>
+        <div class="swatch" style="background: var(--kth-digitalblue);">
+          <div class="name">kthdigitalblue</div><div class="hex">#0029ED</div>
+        </div>
+        <div class="swatch light" style="background: var(--kth-sand);">
+          <div class="name">kthsand</div><div class="hex">#EBE5E0</div>
+        </div>
+        <div class="swatch light" style="background: var(--kth-white); border: 1px solid var(--kth-gray-light);">
+          <div class="name">kthwhite</div><div class="hex">#FFFFFF</div>
+        </div>
+        <div class="swatch" style="background: var(--kth-brokenblack);">
+          <div class="name">kthbrokenblack</div><div class="hex">#212121</div>
+        </div>
+      </div>
+
+      <h3 style="margin: 0.4em 0 0.3em;">Functional <span style="font-size: 0.6em; font-weight: 400; color: var(--kth-gray-dark);">— five families × dark / mid / light, for charts and accents</span></h3>
+      <div class="palette-fn compact" id="palette-functional">
+        <div class="row-label">green</div>
+        <div class="swatch"       style="background: var(--kth-green-dark);"><div class="name">dark</div><div class="hex">#0D4A21</div></div>
+        <div class="swatch"       style="background: var(--kth-green);"><div class="name">mid</div><div class="hex">#4DA060</div></div>
+        <div class="swatch light" style="background: var(--kth-green-light);"><div class="name">light</div><div class="hex">#C7EBBA</div></div>
+
+        <div class="row-label">teal</div>
+        <div class="swatch"       style="background: var(--kth-teal-dark);"><div class="name">dark</div><div class="hex">#1C434C</div></div>
+        <div class="swatch"       style="background: var(--kth-teal);"><div class="name">mid</div><div class="hex">#339C9C</div></div>
+        <div class="swatch light" style="background: var(--kth-teal-light);"><div class="name">light</div><div class="hex">#B2E0E0</div></div>
+
+        <div class="row-label">brick</div>
+        <div class="swatch"       style="background: var(--kth-brick-dark);"><div class="name">dark</div><div class="hex">#78001A</div></div>
+        <div class="swatch"       style="background: var(--kth-brick);"><div class="name">mid</div><div class="hex">#E86A58</div></div>
+        <div class="swatch light" style="background: var(--kth-brick-light);"><div class="name">light</div><div class="hex">#FFCCC4</div></div>
+
+        <div class="row-label">yellow</div>
+        <div class="swatch"       style="background: var(--kth-yellow-dark);"><div class="name">dark</div><div class="hex">#A65900</div></div>
+        <div class="swatch light" style="background: var(--kth-yellow);"><div class="name">mid</div><div class="hex">#FFBE00</div></div>
+        <div class="swatch light" style="background: var(--kth-yellow-light);"><div class="name">light</div><div class="hex">#FFF0B0</div></div>
+
+        <div class="row-label">gray</div>
+        <div class="swatch"       style="background: var(--kth-gray-dark);"><div class="name">dark</div><div class="hex">#323232</div></div>
+        <div class="swatch"       style="background: var(--kth-gray);"><div class="name">mid</div><div class="hex">#A5A5A5</div></div>
+        <div class="swatch light" style="background: var(--kth-gray-light);"><div class="name">light</div><div class="hex">#E6E6E6</div></div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         6. Callouts and inline highlight
+         ================================================================== -->
+    <section>
+      <p class="section-name">Identity · Components</p>
+      <h1>Callouts &amp; highlight</h1>
+
+      <div class="cols-2">
+        <div>
+          <h3>Highlighted box</h3>
+          <div class="kthbox">
+            <code>.kthbox</code> — light-blue panel for summaries.
+          </div>
+
+          <h3 style="margin-top: 0.6em;">Note box</h3>
+          <div class="notebox">
+            <code>.notebox</code> — sand panel for caveats and asides.
+          </div>
+        </div>
+
+        <div>
+          <h3>Inline highlight</h3>
+          <p>Use <span class="kthhl">.kthhl</span> for keywords in bold KTH&nbsp;blue.</p>
+
+          <h3 style="margin-top: 0.6em;">Lists</h3>
+          <ul>
+            <li>Navy bullet markers</li>
+            <li class="fragment fade-in">Fragments stagger reveal</li>
+            <li class="fragment fade-in">Up-arrow rewinds them</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         7. Code slide — highlight.js with KTH-tinted tokens
+         ================================================================== -->
+    <section>
+      <p class="section-name">Identity · Code</p>
+      <h1>Syntax highlighting</h1>
+
+      <pre><code class="language-python" data-trim data-line-numbers="|1|2|3|4-5|7">
+import numpy as np
+KTH_BLUE = "#004791"
+def measure(n=1024):
+    rng = np.random.default_rng(42)
+    return rng.normal(size=n)
+
+print(measure().mean(), KTH_BLUE)
+      </code></pre>
+    </section>
+
+    <!-- ==================================================================
+         "By the numbers" — auto-animate spotlight sequence. Each stat in
+         turn appears centred-large and then slides into its row position
+         when the next stat takes the spotlight. data-auto-animate-id
+         keeps the four steps grouped so reveal only matches data-ids
+         within this sequence (not against other slides).
+         ================================================================== -->
+    <section data-auto-animate data-auto-animate-id="stats" data-transition="none">
+      <p class="section-name">By the numbers</p>
+      <h1>KTH at a glance</h1>
+      <div class="stats-stage">
+        <div class="stat-spotlight" data-id="stat-1">
+          <div class="big-stat" style="color: var(--kth-blue);">14&thinsp;000</div>
+          <div class="big-stat-label">students at KTH</div>
+        </div>
+      </div>
+    </section>
+
+    <section data-auto-animate data-auto-animate-id="stats" data-transition="none">
+      <p class="section-name">By the numbers</p>
+      <h1>KTH at a glance</h1>
+      <div class="stats-stage">
+        <div class="stat-row" data-id="stat-1">
+          <div class="big-stat" style="color: var(--kth-blue);">14&thinsp;000</div>
+          <div class="big-stat-label">students</div>
+        </div>
+        <div class="stat-spotlight" data-id="stat-2">
+          <div class="big-stat" style="color: var(--kth-teal);">5&thinsp;200</div>
+          <div class="big-stat-label">staff &amp; faculty</div>
+        </div>
+      </div>
+    </section>
+
+    <section data-auto-animate data-auto-animate-id="stats" data-transition="none">
+      <p class="section-name">By the numbers</p>
+      <h1>KTH at a glance</h1>
+      <div class="stats-stage">
+        <div class="stat-row" data-id="stat-1">
+          <div class="big-stat" style="color: var(--kth-blue);">14&thinsp;000</div>
+          <div class="big-stat-label">students</div>
+        </div>
+        <div class="stat-row" data-id="stat-2">
+          <div class="big-stat" style="color: var(--kth-teal);">5&thinsp;200</div>
+          <div class="big-stat-label">staff</div>
+        </div>
+        <div class="stat-spotlight" data-id="stat-3">
+          <div class="big-stat" style="color: var(--kth-green);">5</div>
+          <div class="big-stat-label">schools</div>
+        </div>
+      </div>
+    </section>
+
+    <section data-auto-animate data-auto-animate-id="stats" data-transition="none">
+      <p class="section-name">By the numbers</p>
+      <h1>KTH at a glance</h1>
+      <div class="stats-stage">
+        <div class="stat-row" data-id="stat-1">
+          <div class="big-stat" style="color: var(--kth-blue);">14&thinsp;000</div>
+          <div class="big-stat-label">students</div>
+        </div>
+        <div class="stat-row" data-id="stat-2">
+          <div class="big-stat" style="color: var(--kth-teal);">5&thinsp;200</div>
+          <div class="big-stat-label">staff</div>
+        </div>
+        <div class="stat-row" data-id="stat-3">
+          <div class="big-stat" style="color: var(--kth-green);">5</div>
+          <div class="big-stat-label">schools</div>
+        </div>
+        <div class="stat-spotlight" data-id="stat-4">
+          <div class="big-stat" style="color: var(--kth-brick);">1827</div>
+          <div class="big-stat-label">founded</div>
+        </div>
+      </div>
+    </section>
+
+    <section data-auto-animate data-auto-animate-id="stats" data-transition="none">
+      <p class="section-name">By the numbers</p>
+      <h1>KTH at a glance</h1>
+      <div class="stats-stage">
+        <div class="stat-row" data-id="stat-1">
+          <div class="big-stat" style="color: var(--kth-blue);">14&thinsp;000</div>
+          <div class="big-stat-label">students</div>
+        </div>
+        <div class="stat-row" data-id="stat-2">
+          <div class="big-stat" style="color: var(--kth-teal);">5&thinsp;200</div>
+          <div class="big-stat-label">staff &amp; faculty</div>
+        </div>
+        <div class="stat-row" data-id="stat-3">
+          <div class="big-stat" style="color: var(--kth-green);">5</div>
+          <div class="big-stat-label">schools</div>
+        </div>
+        <div class="stat-row" data-id="stat-4">
+          <div class="big-stat" style="color: var(--kth-brick);">1827</div>
+          <div class="big-stat-label">founded</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         10. Section divider — Interactivity
+         ================================================================== -->
+    <section data-state="divider" data-transition="convex"
+             data-pattern="full" data-pattern-color="skyblue">
+      <p class="eyebrow">Part 2 of 2</p>
+      <h2>Interactivity</h2>
+      <p class="lead">Inline canvas, embedded widgets, and arbitrary web&nbsp;apps&nbsp;— all live in your slides.</p>
+    </section>
+
+    <!-- ==================================================================
+         11. Inline interactive widget — Lissajous canvas animation
+         ================================================================== -->
+    <section data-transition="fade">
+      <p class="section-name">Interactivity · Inline canvas</p>
+      <h1>Animate anything</h1>
+
+      <div class="cols-2" style="grid-template-columns: 1fr 1.2fr;">
+        <div>
+          <p>Drop a <code>&lt;canvas&gt;</code> into a slide. <span class="kthhl">Visibility events</span> let you pause off-screen animations.</p>
+          <ul>
+            <li><code>fragmentshown</code> · <code>fragmenthidden</code></li>
+            <li><code>slidechanged</code></li>
+            <li><code>Reveal.getCurrentSlide()</code></li>
+          </ul>
+        </div>
+        <div>
+          <canvas id="lissajous" width="640" height="420"
+                  style="width: 100%; height: 460px; background: var(--kth-sand); border-radius: 6px;"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         Inline SVG animation — bullet-list body text + animated pp-collision
+         ================================================================== -->
+    <section data-transition="fade">
+      <p class="section-name">Interactivity · Inline SVG</p>
+      <h1>Particle collision</h1>
+
+      <div class="cols-2">
+        <div>
+          <p>Protons at <span class="kthhl">6.8&nbsp;TeV per beam</span>, head-on at four detectors.</p>
+          <ul>
+            <li><span class="kthhl">ATLAS</span>, CMS, LHCb, ALICE</li>
+            <li>Hard scattering &rarr; high-$p_\mathrm{T}$ jets</li>
+            <li>$E_\mathrm{T}^\mathrm{miss}$ hints at new physics</li>
+          </ul>
+        </div>
+        <div>
+          <svg class="lhc-figure" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet">
+            <!-- Per-track gradients (transparent → opaque along the path)
+                 and the outgoing-track pool are populated by JS so the
+                 number, geometry, and colour of tracks can be randomised
+                 per cycle. The two incoming protons stay constant. -->
+            <defs id="lhc-defs"></defs>
+            <line class="track in"  x1="0"   y1="250" x2="400" y2="250" pathLength="1"/>
+            <line class="track in"  x1="800" y1="250" x2="400" y2="250" pathLength="1"/>
+            <circle class="burst" cx="400" cy="250" r="0"/>
+            <g id="lhc-tracks"></g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         12. Iframe widget — orbit.html
+         (Iframe height is sized so the slide content fits within 1080 px;
+          larger iframes force reveal's print-pdf to spill onto a 2nd page.)
+         ================================================================== -->
+    <section data-transition="fade">
+      <p class="section-name">Interactivity · Embedded widgets</p>
+      <h1>Drop in any web app</h1>
+
+      <div class="vcenter">
+        <iframe class="widget" data-src="widgets/orbit.html" loading="lazy"
+                style="height: 580px;"></iframe>
+      </div>
+    </section>
+
+    <!-- ==================================================================
+         13. Closing — KTH-blue, white logo centred
+         ================================================================== -->
+    <section data-state="closing" data-transition="zoom"
+             data-pattern="tl, bl mirror-x" data-pattern-color="white">
+      <h2>Tack!</h2>
+      <p class="lead">Questions, comments, ideas&nbsp;— <a href="mailto:name@kth.se">name@kth.se</a></p>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/notes/notes.js"></script>
+
+<script>
+  Reveal.initialize({
+    width: 1920,
+    height: 1080,
+    margin: 0.0,
+
+    // Top-align content slides — cover/divider/closing handle their own
+    // vertical layout via padding in kth-reveal.css.
+    center: false,
+
+    controls: true,
+    controlsTutorial: false,
+    progress: false,
+    history: true,
+    hash: true,
+
+    // We render our own KTH footer; reveal's slide-number is hidden in CSS.
+    slideNumber: false,
+
+    transition: 'slide',
+    transitionSpeed: 'default',
+    backgroundTransition: 'fade',
+
+    pdfSeparateFragments: false,
+
+    plugins: [ RevealHighlight, RevealNotes ],
+  });
+
+  // --------------------------------------------------------------------- //
+  // KTH line pattern (linjemönster) geometry — Brand guidelines pp. 23-28. //
+  //                                                                       //
+  // The 1920×1080 master pattern is split into four corner groups so each //
+  // .kth-pattern instance can render just one corner's paths. That keeps  //
+  // the visible motif aligned to the slide edges (rather than smearing    //
+  // orphan path fragments through the middle when clipped). Authors can   //
+  // also request "full" to get all six paths at once (the old behavior).  //
+  //                                                                       //
+  // Inlining (as opposed to an external .svg) lets stroke="currentColor"  //
+  // inherit from the wrapping div's CSS `color`, so the brand palette     //
+  // stays in CSS — and there's no file:// fetch for the SVG, which was   //
+  // flaky as `mask-image` / via `<object>` across browsers.               //
+  // --------------------------------------------------------------------- //
+  const KTH_PATTERN_PATHS = {
+    tl: [
+      '<polyline points="-5.5 213.5 213.5 213.5 -4.5 648.5"/>',
+      '<path d="m426.12-6.5v221.57c0,117.04-94.88,211.93-211.93,211.93H-5.5"/>',
+    ],
+    tr: [
+      '<path d="m1066.04-3v429.38c-117.11,0-212.04-94.93-212.04-212.04h1067.5"/>',
+      '<path d="m1493,0c0,235.83,191.17,427,427,427"/>',
+    ],
+    bl: [
+      '<path d="m427.13,1080.31c0-124.95-101.29-226.25-226.25-226.25H-4.5"/>',
+    ],
+    br: [
+      '<polyline points="1925.5 853.91 1492.84 853.91 1279.82 640 1279.82 1067 1708.29 640 1925.89 640"/>',
+    ],
+  };
+
+  function kthPatternSvg(source) {
+    const paths = source === 'full'
+      ? Object.values(KTH_PATTERN_PATHS).flat()
+      : (KTH_PATTERN_PATHS[source] || []);
+    return '<svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">' +
+           paths.join('') +
+           '</svg>';
+  }
+
+  // --------------------------------------------------------------------- //
+  // Master chrome injector                                                //
+  //                                                                       //
+  // Inserts a logo (and footer where appropriate) into every section,    //
+  // sized and positioned per the slide variant. Done in JS so each PDF   //
+  // page gets its own self-contained chrome — body-class-based selectors //
+  // would only style the currently-active slide and miss the rest in     //
+  // print-pdf mode.                                                       //
+  // --------------------------------------------------------------------- //
+  function injectMasterChrome() {
+    const reveal = document.querySelector('.reveal');
+    const author   = reveal.dataset.kthAuthor             || '';
+    const inst     = reveal.dataset.kthInstitute          || '';
+    const affShort = reveal.dataset.kthAffiliationShort   || '';
+    // Footer renders "Name (Aff)" — short affiliation in parentheses right
+    // after the name. The long form (data-kth-institute) drives the cover
+    // meta paragraph instead.
+    const namePlusAff = author + (affShort ? ' (' + affShort + ')' : '');
+    const sections = document.querySelectorAll('.reveal .slides > section');
+    const total = sections.length;
+    sections.forEach((section, i) => {
+      const state = section.dataset.state;
+      const idx = i + 1;
+
+      // Linjemönster — KTH brand line pattern (Brand guidelines pp. 23-28).
+      // Opt-in via data-pattern, whose value is a comma-separated list of
+      // pattern instances. Each instance is space-separated tokens:
+      //
+      //   <source> [transform...]
+      //
+      // where <source> is the corner-paths group to render
+      // (tl | tr | bl | br | full), and transforms compose:
+      // (rotate-180 | mirror-x | mirror-y). The transform is applied to
+      // the inner <svg>, so e.g. "bl mirror-x" renders only the BL paths
+      // (just path 2) and mirrors them horizontally — landing the
+      // bottom-left content in the slide's bottom-right with the curve's
+      // straight sides still flush against the slide edges.
+      //
+      // Examples:
+      //   data-pattern="tl, bl mirror-x"  cover-style: TL natural + BL→BR
+      //   data-pattern="tl, br"           content-slide style: TL + BR
+      //   data-pattern="full"             full-bleed (the old default)
+      //   data-pattern (no value)         shorthand for "full"
+      //
+      // Stroke colour from data-pattern-color (skyblue|blue|navy|lightblue
+      // |sand|white|digitalblue), defaulting to skyblue and shared by all
+      // instances on the section.
+      if (section.hasAttribute('data-pattern')) {
+        const spec   = (section.getAttribute('data-pattern') || '').toLowerCase().trim();
+        const colour = (section.dataset.patternColor || 'skyblue').toLowerCase();
+        const SOURCES = ['tl', 'tr', 'bl', 'br', 'full'];
+        const XFORMS  = ['rotate-180', 'mirror-x', 'mirror-y'];
+        const items = spec ? spec.split(',').map(s => s.trim()).filter(Boolean) : ['full'];
+        for (const item of items) {
+          const tokens = item.split(/\s+/);
+          const source = tokens.find(t => SOURCES.includes(t)) || 'full';
+          const cls = ['kth-pattern', colour];
+          for (const t of tokens) {
+            if (XFORMS.includes(t)) cls.push(t);
+          }
+          section.insertAdjacentHTML('afterbegin',
+            '<div class="' + cls.join(' ') + '">' + kthPatternSvg(source) + '</div>');
+        }
+      }
+
+      if (state === 'cover') {
+        section.insertAdjacentHTML('afterbegin',
+          '<img class="kth-cover-logo" src="KTH_logo_RGB_bla.svg" alt="KTH">');
+      } else if (state === 'closing') {
+        section.insertAdjacentHTML('afterbegin',
+          '<img class="kth-closing-logo" src="KTH_logo_RGB_bla.svg" alt="KTH">');
+      } else if (state === 'divider') {
+        // Dividers get the small logo in the corner but no footer — they're
+        // section-break slides, not numbered content.
+        section.insertAdjacentHTML('afterbegin',
+          '<img class="kth-page-logo" src="KTH_logo_RGB_bla.svg" alt="KTH">');
+      } else {
+        section.insertAdjacentHTML('afterbegin',
+          '<img class="kth-page-logo" src="KTH_logo_RGB_bla.svg" alt="KTH">' +
+          '<div class="kth-page-footer">' +
+            '<span class="left">'  + namePlusAff + '</span>' +
+            '<span class="center">' + idx + ' / ' + total + '</span>' +
+            '<span class="right"></span>' +
+          '</div>');
+      }
+    });
+  }
+  injectMasterChrome();
+
+  // --------------------------------------------------------------------- //
+  // Reveal v5 does NOT mirror data-state to the generated .slide-         //
+  // background div, so we sync that here for the per-variant background   //
+  // colours defined in kth-reveal.css.                                    //
+  // --------------------------------------------------------------------- //
+  function mirrorStateToBackgrounds() {
+    document.querySelectorAll('.reveal .slides section').forEach((slide) => {
+      const state = slide.dataset.state;
+      const bg    = slide.slideBackgroundElement;
+      if (!bg) return;
+      if (state) bg.dataset.state = state;
+      else       delete bg.dataset.state;
+    });
+  }
+  Reveal.on('ready',        mirrorStateToBackgrounds);
+  Reveal.on('slidechanged', mirrorStateToBackgrounds);
+
+  // --------------------------------------------------------------------- //
+  // Stagger swatch entry per palette grid                                  //
+  // --------------------------------------------------------------------- //
+  function staggerSwatches(el, step = 0.05, base = 0.05) {
+    if (!el) return;
+    [...el.children].forEach((child, i) => {
+      child.style.animationDelay = (base + i * step) + 's';
+    });
+  }
+  staggerSwatches(document.getElementById('palette-primary'));
+  staggerSwatches(document.getElementById('palette-functional'), 0.035, 0.05);
+
+  Reveal.on('slidechanged', (event) => {
+    event.currentSlide.querySelectorAll('.palette, .palette-fn').forEach(grid => {
+      [...grid.children].forEach(c => {
+        c.style.animation = 'none';
+        c.offsetHeight;                   // force reflow
+        c.style.animation = '';
+      });
+    });
+  });
+
+  // --------------------------------------------------------------------- //
+  // Inline canvas widget — Lissajous figure that drifts colour through    //
+  // the KTH palette. Pauses when its slide is not visible.                //
+  // --------------------------------------------------------------------- //
+  (() => {
+    const canvas = document.getElementById('lissajous');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const COLORS = [
+      '#004791', '#6298D2', '#339C9C', '#4DA060',
+      '#E86A58', '#000061',
+    ];
+
+    let t = 0;
+    let running = true;
+    let trail = [];
+
+    function step() {
+      if (!running) return;
+      const W = canvas.width, H = canvas.height;
+      ctx.fillStyle = 'rgba(235, 229, 224, 0.06)';
+      ctx.fillRect(0, 0, W, H);
+
+      const cx = W / 2, cy = H / 2;
+      const a = 3, b = 4;
+      const phase = t * 0.0008;
+      const x = cx + Math.cos(a * t * 0.01 + phase) * (W * 0.35);
+      const y = cy + Math.sin(b * t * 0.01) * (H * 0.38);
+
+      trail.push({ x, y });
+      if (trail.length > 240) trail.shift();
+
+      for (let i = 1; i < trail.length; i++) {
+        const p0 = trail[i - 1], p1 = trail[i];
+        const ratio = i / trail.length;
+        const colour = COLORS[Math.floor((t * 0.005 + ratio * 2) % COLORS.length)];
+        ctx.strokeStyle = colour;
+        ctx.lineWidth = 2 + ratio * 4;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.stroke();
+      }
+      t += 1;
+      requestAnimationFrame(step);
+    }
+
+    step();
+
+    Reveal.on('slidechanged', (event) => {
+      const onSlide = event.currentSlide.contains(canvas);
+      if (onSlide && !running) { running = true; step(); }
+      if (!onSlide) { running = false; }
+    });
+  })();
+
+  // --------------------------------------------------------------------- //
+  // LHC collision — pool of 16 outgoing tracks, randomised each cycle.    //
+  //                                                                       //
+  //   - Random count between 8 and 16 visible per cycle (avg ~12, twice   //
+  //     the original 6).                                                  //
+  //   - Each visible track gets a random angle (rejecting ±9° around the  //
+  //     incoming-beam axis), random length 260–390, and a random          //
+  //     perpendicular curvature in either direction (magnetic-field       //
+  //     deflection sign).                                                 //
+  //   - Each track's stroke is a per-track <linearGradient> from          //
+  //     transparent at the vertex to opaque at the leading edge, painted  //
+  //     in a colour picked at random from the KTH palette (sand           //
+  //     excluded — it's the figure's background).                         //
+  //                                                                       //
+  // Triggered on the first track's `animationiteration` event (fires      //
+  // when the 3s loop wraps), at which point all tracks are at             //
+  // stroke-dashoffset=1 (invisible), so the d-attribute and gradient      //
+  // swap isn't visible.                                                   //
+  // --------------------------------------------------------------------- //
+  (() => {
+    const svg = document.querySelector('.lhc-figure');
+    if (!svg) return;
+    const defs   = svg.querySelector('#lhc-defs');
+    const tracks = svg.querySelector('#lhc-tracks');
+    if (!defs || !tracks) return;
+
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const CX = 400, CY = 250;
+    const POOL_SIZE = 16;
+
+    // KTH palette (every named colour) minus sand, which is the figure bg.
+    const PALETTE = [
+      '#004791', '#6298D2', '#000061', '#DEF0FF', '#0029ED', '#212121', '#FCFCFC',
+      '#0D4A21', '#4DA060', '#C7EBBA',
+      '#1C434C', '#339C9C', '#B2E0E0',
+      '#78001A', '#E86A58', '#FFCCC4',
+      '#A65900', '#FFBE00', '#FFF0B0',
+      '#323232', '#A5A5A5', '#E6E6E6',
+    ];
+
+    // Build the pool (gradients in <defs>, paths in <g id="lhc-tracks">).
+    const pathEls = [];
+    const gradEls = [];
+    for (let i = 0; i < POOL_SIZE; i++) {
+      const grad = document.createElementNS(SVG_NS, 'linearGradient');
+      grad.setAttribute('id', `lhc-trail-${i}`);
+      grad.setAttribute('gradientUnits', 'userSpaceOnUse');
+      grad.setAttribute('x1', CX); grad.setAttribute('y1', CY);
+      grad.setAttribute('x2', CX); grad.setAttribute('y2', CY);
+      const s0 = document.createElementNS(SVG_NS, 'stop');
+      s0.setAttribute('offset', '0');     s0.setAttribute('stop-opacity', '0');
+      const s1 = document.createElementNS(SVG_NS, 'stop');
+      s1.setAttribute('offset', '1');     s1.setAttribute('stop-opacity', '1');
+      grad.appendChild(s0); grad.appendChild(s1);
+      defs.appendChild(grad);
+      gradEls.push(grad);
+
+      const path = document.createElementNS(SVG_NS, 'path');
+      path.setAttribute('class', 'track out');
+      path.setAttribute('stroke', `url(#lhc-trail-${i})`);
+      path.setAttribute('pathLength', '1');
+      path.setAttribute('d', `M ${CX} ${CY} L ${CX} ${CY}`);
+      tracks.appendChild(path);
+      pathEls.push(path);
+    }
+
+    function randomise() {
+      const count = 8 + Math.floor(Math.random() * 9);  // 8..16 inclusive
+      for (let i = 0; i < POOL_SIZE; i++) {
+        const path = pathEls[i];
+        const grad = gradEls[i];
+        if (i >= count) { path.style.display = 'none'; continue; }
+        path.style.display = '';
+
+        let angle;
+        do { angle = Math.random() * Math.PI * 2; }
+        while (Math.abs(Math.sin(angle)) < 0.15);
+
+        const length = 260 + Math.random() * 130;
+        const ex = CX + length * Math.cos(angle);
+        const ey = CY + length * Math.sin(angle);
+
+        const mx = (CX + ex) / 2, my = (CY + ey) / 2;
+        const px = -Math.sin(angle), py = Math.cos(angle);
+        const curve = (Math.random() * 0.7 - 0.35) * length;
+        const cpX = mx + px * curve;
+        const cpY = my + py * curve;
+
+        path.setAttribute('d',
+          `M ${CX} ${CY} Q ${cpX.toFixed(0)} ${cpY.toFixed(0)} ${ex.toFixed(0)} ${ey.toFixed(0)}`);
+
+        grad.setAttribute('x2', ex.toFixed(0));
+        grad.setAttribute('y2', ey.toFixed(0));
+        const colour = PALETTE[Math.floor(Math.random() * PALETTE.length)];
+        grad.children[0].setAttribute('stop-color', colour);
+        grad.children[1].setAttribute('stop-color', colour);
+      }
+    }
+
+    randomise();
+    pathEls[0].addEventListener('animationiteration', randomise);
+  })();
+
+  // --------------------------------------------------------------------- //
+  // KaTeX — render $…$ inline math after Reveal has laid out the slides. //
+  // Walks the whole document.body in one pass (off-screen slides are     //
+  // still in the DOM, so they get processed too).                        //
+  // --------------------------------------------------------------------- //
+  function renderKatex() {
+    if (typeof renderMathInElement !== 'function') return;
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: '$$', right: '$$', display: true  },
+        { left: '$',  right: '$',  display: false },
+      ],
+      throwOnError: false,
+    });
+  }
+  if (document.readyState === 'complete') renderKatex();
+  else window.addEventListener('load', renderKatex);
+</script>
+
+</body>
+</html>

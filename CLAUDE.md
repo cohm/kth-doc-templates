@@ -4,19 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-KTH document templates for two toolchains, sharing the same KTH Graphical
+KTH document templates for three toolchains, sharing the same KTH Graphical
 Profile (Grafisk manual v1.2, 2024):
 
 - **LaTeX** — `kth-document.cls` + `example.tex`. Compile with pdflatex / xelatex / lualatex.
 - **Markdown** — `md-to-pdf.{json,css}` + `example.md`. Render with [md-to-pdf](https://github.com/simonhaenisch/md-to-pdf) (Puppeteer-backed).
+- **Slides** — `reveal/kth-reveal.css` + `reveal/example.html`. Open directly in a browser; reveal.js loads from CDN. Print-PDF via `?print-pdf` query.
 
-Both flows are kept visually aligned: same palette, same Figtree-headings /
-Georgia-body fonts, same heading hierarchy and metadata block, so a `.tex`
-and a `.md` rendering of the same content look like siblings.
+All three flows are kept visually aligned: same palette, same Figtree-headings /
+Georgia-body fonts, same heading hierarchy and metadata block, so the
+rendered outputs of the same content look like siblings.
 
-`example.tex` and `example.md` are both the user-facing manual *and* the
-smoke test. `consumer-example/` shows the recommended layout for downstream
-packages that include this repo as a git submodule.
+`example.tex`, `example.md`, and `reveal/example.html` are all both the
+user-facing manual *and* the smoke test. `consumer-example/` shows the
+recommended layout for downstream packages that include this repo as a git
+submodule.
 
 ## Build
 
@@ -28,6 +30,11 @@ xelatex  example.tex     # exact KTH fonts via fontspec
 
 # Markdown
 md-to-pdf example.md --config-file md-to-pdf.json --document-title "Project Title"
+
+# Slides
+open reveal/example.html                                       # live preview
+npm install --no-save puppeteer                                # one-time, in repo root
+node reveal/build-preview.mjs                                  # → docs/preview/example-reveal.png + example-reveal.pdf
 
 # Consumer example (exercises the submodule pattern via a .templates symlink)
 make -C consumer-example/docs
@@ -45,17 +52,26 @@ auto-generated previews, see CI section).
 
 `.github/workflows/build.yml` runs on every push and PR:
 
-1. Builds `example.tex` (pdflatex), `example.md` (md-to-pdf), and the
-   consumer-example via its Makefile — each is a smoke test of one flow.
-2. Renders first-page PNG previews of the two `example.*` outputs at 150 dpi
-   via `pdftoppm`, into `docs/preview/example-{tex,md}.png`.
-3. Uploads all PDFs as a workflow artefact (`pdfs`).
-4. **On push to main only:** commits the regenerated PNGs back to
-   `docs/preview/` with `[skip ci]`. The `paths-ignore: ['docs/preview/**']`
-   filter on the workflow prevents the auto-commit from triggering itself.
+1. Builds `example.tex` (pdflatex), `example.md` (md-to-pdf), the
+   consumer-example via its Makefile, and the reveal deck's print-PDF
+   export via Puppeteer (`reveal/build-preview.mjs`). Each step is a
+   smoke test of one flow.
+2. Renders first-page PNG previews of the two `example.*` PDFs at 150
+   dpi via `pdftoppm`, into `docs/preview/example-{tex,md}.png`. The
+   reveal flow no longer produces a preview PNG — the live deck on
+   GitHub Pages serves that purpose now.
+3. Uploads all PDFs (incl. `example-reveal.pdf`) as a workflow artefact.
+4. **On push to main only:** commits the regenerated LaTeX/Markdown
+   PNGs back to `docs/preview/` with `[skip ci]`. The
+   `paths-ignore: ['docs/preview/**']` filter on the workflow prevents
+   the auto-commit from triggering itself.
 
-The `README.md` references those PNGs directly, so the README always shows
-the current state of the templates.
+The interactive reveal deck is published via GitHub Pages at
+`https://cohm.github.io/kth-doc-templates/reveal/example.html` (deploy
+from `main`, root). README links there directly. The LaTeX/Markdown
+README previews still reference `docs/preview/example-{tex,md}.png` so
+they always reflect the current state of those flows without leaving
+github.com.
 
 ## Architecture of `kth-document.cls`
 
@@ -124,6 +140,132 @@ When changing the `md-to-pdf.json`'s `headerTemplate` / `footerTemplate`,
 remember Chromium runs them in a stripped context: only inline CSS works,
 font sizes don't inherit, and there's no API to detect first page (hence
 the `@page :first` margin trick).
+
+## Reveal.js slide theme (`reveal/`)
+
+`reveal/kth-reveal.css` is the third toolchain. The visual design follows
+the official KTH PowerPoint master, using the
+[kthpq](https://github.com/th-rtyf-re/kthpq) Beamer port as the reference
+since the .pptx itself is auth-walled on intra.kth.se. Mirrors the *same*
+KTH custom properties as `md-to-pdf.css` so the palette is a single
+conceptual source of truth across all three flows.
+
+Layout per slide variant (set via `data-state` on `<section>`):
+
+| variant | bg | logo | footer | line motif |
+|---------|----|------|--------|-----------|
+| cover (default) | `--kth-lightblue` | large, top-centre | — | sky-blue official 16:9 |
+| (no state) | `--kth-brokenwhite` | small, top-left | author / institute / page | — |
+| divider | `--kth-sand` | small, top-left | (same) | sky-blue, mirrored |
+| closing | `--kth-blue` | white, centred (filter-inverted) | — | white official 16:9 |
+
+Things to know before editing:
+
+- **CDN over npm.** `example.html` loads `reveal.js@5.x` from jsDelivr,
+  Figtree from Google Fonts. Zero install — `open reveal/example.html`
+  works. We deliberately avoid a `package.json` in the repo root to keep
+  the onboarding story flat. `puppeteer` is only pulled in transiently by
+  the CI preview script (`build-preview.mjs`).
+
+- **Logo asset map: vector everywhere.** Two formats for the same KTH
+  blue logo, one per toolchain's preferred format:
+  - `KTH_logo_RGB_bla.svg` (repo root + `reveal/`) — the canonical web
+    asset shipped by KTH. Used by `<img>` in `reveal/example.html` and
+    by `![]()` references in Markdown sources. ~55 KB.
+  - `KTH_logo_RGB_bla.pdf` (repo root only) — derived one-off from the
+    SVG via `inkscape --export-type=pdf`. Used by `\includegraphics`
+    in the LaTeX class. ~35 KB. RGB colour space matches the SVG, so
+    the LaTeX output is colour-faithful with the HTML/MD renders.
+  Two copies of the SVG (root + reveal/) are deliberate, not a symlink:
+  Safari ≥13 treats each `file://` URL as having a unique origin and
+  blocks parent-directory traversal even through a symlink, so
+  `<img src="../KTH_logo_RGB_bla.svg">` would silently 404 in Safari.
+  Same-directory-only references work everywhere. The class's
+  `\kthlogopath` search order (`.pdf → .png → .eps`) is unchanged —
+  we just don't ship a PNG anymore; downstream users who want to point
+  at their own raster can still drop one in alongside `\renewcommand`.
+  If KTH ever updates the logo, replace both SVGs and re-run Inkscape
+  to refresh the PDF.
+
+- **Sizing.** Base font size is `42px` and heading sizes are explicit pixel
+  values (`92 / 60 / 44 / 34px` for `h1`–`h4`) — presentation-scale, not
+  document-scale. To resize the whole deck, change `--r-main-font-size`
+  and the four `--r-heading*-size` values in one place.
+
+- **Master chrome is injected per-section by JS** (see `injectMasterChrome`
+  in `example.html`), not via a single global overlay. This is essential
+  for print-pdf mode, where reveal stacks every slide into one DOM —
+  body-class-based chrome would only style the *current* slide and leave
+  the rest unstyled in the exported PDF.
+
+- **Print-PDF padding override.** Reveal's print stylesheet sets
+  `padding: 0 !important; min-height: 1px;` on every section. Re-apply
+  the cover / divider / closing / content padding under
+  `html.reveal-print .reveal .slides section[data-state="…"]` (descendant
+  combinator — *not* `>`, because in print mode sections sit inside
+  `.pdf-page` wrappers).
+
+- **Don't let any single slide's content + padding exceed 1080px.**
+  Reveal's print code computes
+  `numberOfPages = Math.ceil(slide.scrollHeight / pageHeight)` and renders
+  each over-tall slide on a 2160px-tall PDF page (one filled, one blank).
+  The empty page in the exported PDF is the symptom. Slide 12 (iframe
+  widget) is the closest to the limit — keep iframe height ≤ ~580px when
+  it's the slide's main content.
+
+- **White logo on the closing slide is rendered by inverting the black SVG**
+  with `filter: brightness(0) invert(1)`. CSS filters apply to the
+  rasterised render of an `<img>` regardless of source format, so the
+  trick works identically on the SVG as it did on the PNG it replaced.
+  No separate "white" file required.
+
+- **Linjemönster (line pattern).** The 1920×1080 master is split into
+  corner-specific path groups (`KTH_PATTERN_PATHS` in `example.html`'s
+  `<script>` block). Each `.kth-pattern` instance renders only the paths
+  for its source corner, so the visible motif sits flush against the
+  slide edges — no orphan strokes through the middle the way a clipped
+  full-bleed render would have. The paths use `stroke="currentColor"`,
+  so the brand palette is applied via plain CSS (`color: var(--kth-…)`,
+  one rule per palette name). No external SVG file, no `mask-image`, no
+  `<object>` — all three were flaky over `file://`. Author API:
+  `<section data-pattern="tl, bl mirror-x" data-pattern-color="skyblue">`,
+  where `data-pattern` is a comma-separated list of pattern instances.
+  Each instance is `<source> [transforms]`: source is `tl|tr|bl|br|full`,
+  transforms compose `rotate-180 | mirror-x | mirror-y` (90°/270° aren't
+  exposed — master is 16:9). Transforms apply to the inner `<svg>` (not
+  the wrapper), so e.g. "bl mirror-x" renders only path 2 and flips it
+  horizontally, landing the BL content in the slide's BR with its
+  straight sides still flush against the slide edges. `data-pattern`
+  with no value is shorthand for `full`. Implements Brand guidelines
+  pp. 23–28 (insert / rotate-mirror / crop). The logo safe-zone patches
+  (`section[data-state="cover"]::after`, `section[data-state="closing"]::after`)
+  implement the p.27 rule "Never place the line pattern behind KTH's
+  logotype" by punching a slide-bg-coloured rectangle through the
+  pattern at the logo position.
+
+- **Slide-background colours via JS mirror.** Reveal does *not* propagate
+  `data-state` from `<section>` to its generated `.slide-background` div.
+  The example deck mirrors it via `slide.slideBackgroundElement`, so
+  per-state background colours (`.slide-background[data-state~="cover"]`)
+  actually apply.
+
+- **Embedding widgets.** Use `<iframe class="widget" data-src="…">` (note
+  `data-src`). Reveal sets `src` only when the slide is in view, keeping
+  off-screen iframes idle. Drop standalone HTML into `reveal/widgets/` —
+  `orbit.html` is the reference. Note: in `?print-pdf` exports, iframes
+  render blank because puppeteer doesn't load lazy iframes during the
+  print snapshot — that's expected; the live deck is the canonical
+  presentation, the PDF is for handouts.
+
+- **Author / institute footer text** is set via `data-kth-author` and
+  `data-kth-institute` attributes on the `.reveal` wrapper — read once at
+  init time by `injectMasterChrome`.
+
+- **CI preview.** `reveal/build-preview.mjs` spins up a local static
+  server, drives Puppeteer to screenshot slide 1 (the cover) at
+  1920×1080, and exports the full deck via `?print-pdf` to
+  `example-reveal.pdf`. The GH workflow installs puppeteer into
+  `$RUNNER_TEMP/puppeteer-deps` and points `NODE_PATH` at it.
 
 ## Consumer-example pattern
 

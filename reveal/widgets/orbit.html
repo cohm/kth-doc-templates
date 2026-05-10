@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Orbit — KTH widget demo</title>
+<style>
+  :root {
+    --kth-blue:        #004791;
+    --kth-skyblue:     #6298D2;
+    --kth-navy:        #000061;
+    --kth-yellow:      #FFBE00;
+    --kth-green:       #4DA060;
+    --kth-teal:        #339C9C;
+    --kth-brick:       #E86A58;
+    --kth-sand:        #EBE5E0;
+    --kth-brokenblack: #212121;
+  }
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: var(--kth-sand);
+    font-family: 'Figtree', system-ui, sans-serif;
+    color: var(--kth-brokenblack);
+    overflow: hidden;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .ui {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(255, 255, 255, 0.86);
+    backdrop-filter: blur(6px);
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 2px 12px rgba(0, 71, 145, 0.12);
+    pointer-events: none;
+  }
+
+  .ui h1 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--kth-blue);
+    letter-spacing: 0.02em;
+  }
+
+  .ui p {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: var(--kth-brokenblack);
+    opacity: 0.7;
+  }
+
+  .ui .counter {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 2px 8px;
+    background: var(--kth-blue);
+    color: white;
+    border-radius: 10px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    pointer-events: auto;
+  }
+
+  .controls {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+  }
+
+  .controls button {
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--kth-blue);
+    background: white;
+    border: 1.5px solid var(--kth-blue);
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .controls button:hover {
+    background: var(--kth-blue);
+    color: white;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <canvas id="c"></canvas>
+
+  <div class="ui">
+    <h1>Orbit</h1>
+    <p>Move your mouse to attract · click to add particles</p>
+    <span class="counter">particles: <span id="count">0</span></span>
+  </div>
+
+  <div class="controls">
+    <button id="add">+50</button>
+    <button id="reset">Reset</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const counter = document.getElementById('count');
+
+const COLORS = [
+  getComputedStyle(document.documentElement).getPropertyValue('--kth-blue').trim(),
+  getComputedStyle(document.documentElement).getPropertyValue('--kth-skyblue').trim(),
+  getComputedStyle(document.documentElement).getPropertyValue('--kth-yellow').trim(),
+  getComputedStyle(document.documentElement).getPropertyValue('--kth-green').trim(),
+  getComputedStyle(document.documentElement).getPropertyValue('--kth-teal').trim(),
+  getComputedStyle(document.documentElement).getPropertyValue('--kth-brick').trim(),
+];
+
+let DPR = Math.min(window.devicePixelRatio || 1, 2);
+let W = 0, H = 0;
+let mouse = { x: -9999, y: -9999, active: false };
+let particles = [];
+
+function resize() {
+  W = canvas.clientWidth;
+  H = canvas.clientHeight;
+  canvas.width  = W * DPR;
+  canvas.height = H * DPR;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+
+function spawn(n, x, y) {
+  for (let i = 0; i < n; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 0.4 + Math.random() * 1.4;
+    particles.push({
+      x: x ?? Math.random() * W,
+      y: y ?? Math.random() * H,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      r:  1.6 + Math.random() * 3.2,
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      life: 1,
+    });
+  }
+}
+
+function tick() {
+  ctx.fillStyle = 'rgba(235, 229, 224, 0.18)';
+  ctx.fillRect(0, 0, W, H);
+
+  for (const p of particles) {
+    if (mouse.active) {
+      const dx = mouse.x - p.x;
+      const dy = mouse.y - p.y;
+      const d2 = dx * dx + dy * dy;
+      const d  = Math.sqrt(d2) + 0.001;
+      const force = Math.min(60 / d, 0.6);
+      p.vx += (dx / d) * force * 0.12;
+      p.vy += (dy / d) * force * 0.12;
+    }
+
+    p.vx *= 0.985;
+    p.vy *= 0.985;
+    p.x += p.vx;
+    p.y += p.vy;
+
+    if (p.x < 0)  { p.x = 0; p.vx *= -0.7; }
+    if (p.x > W)  { p.x = W; p.vx *= -0.7; }
+    if (p.y < 0)  { p.y = 0; p.vy *= -0.7; }
+    if (p.y > H)  { p.y = H; p.vy *= -0.7; }
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+  }
+
+  counter.textContent = particles.length;
+  requestAnimationFrame(tick);
+}
+
+canvas.addEventListener('mousemove', (e) => {
+  const r = canvas.getBoundingClientRect();
+  mouse.x = e.clientX - r.left;
+  mouse.y = e.clientY - r.top;
+  mouse.active = true;
+});
+canvas.addEventListener('mouseleave', () => { mouse.active = false; });
+canvas.addEventListener('click', (e) => {
+  const r = canvas.getBoundingClientRect();
+  spawn(20, e.clientX - r.left, e.clientY - r.top);
+});
+
+document.getElementById('add').addEventListener('click', () => spawn(50));
+document.getElementById('reset').addEventListener('click', () => {
+  particles = [];
+  spawn(60);
+});
+
+window.addEventListener('resize', resize);
+resize();
+spawn(80);
+tick();
+</script>
+</body>
+</html>
