@@ -38,7 +38,7 @@ keeps using `\documentclass{kth-document}` with no path prefix.
 **Markdown.** `md-to-pdf` is invoked with `--config-file
 .templates/md-to-pdf.json --stylesheet .templates/md-to-pdf.css`. References
 to the logo in your `.md` use the explicit path
-`![](.templates/KTH_logo_RGB_bla.png)` since md-to-pdf resolves images
+`![](.templates/KTH_logo_RGB_bla.svg)` since md-to-pdf resolves images
 relative to the source file.
 
 ## Updating the templates

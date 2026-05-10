@@ -8,13 +8,17 @@ memos, slide decks, as a git submodule for package documentation, etc.
 
 ## Previews
 
-| LaTeX (`example.tex` → lualatex) | Markdown (`example.md` → md-to-pdf) | Slides (`reveal/example.html`) |
+| LaTeX (`example.tex` → lualatex) | Markdown (`example.md` → md-to-pdf) | Slides ([live deck][live]) |
 |----------------------------------|--------------------------------------|--------------------------------|
 | ![](docs/preview/example-tex.png) | ![](docs/preview/example-md.png) | ![](docs/preview/example-reveal.png) |
 
+[live]: https://cohm.github.io/kth-doc-templates/reveal/example.html
+
 The previews above are regenerated automatically by CI on every push to
 `main`, so they always reflect the current state of the templates. PDFs
-from each CI run are available as workflow artefacts.
+from each CI run are available as workflow artefacts. The reveal deck is
+also served live via GitHub Pages at the [link above][live] — interact
+with the animations, transitions, and embedded widgets in your browser.
 
 ## Files
 
@@ -26,7 +30,8 @@ from each CI run are available as workflow artefacts.
 | `reveal/example.html` | Annotated reveal.js example deck / starting point |
 | `reveal/widgets/` | Drop-in interactive widgets embedded via `<iframe>` |
 | `example.tex`, `example.md` | Fully annotated examples / starting points |
-| `KTH_logo_RGB_bla.png` | KTH logo (blue, PNG) — place next to your source file |
+| `KTH_logo_RGB_bla.svg` | KTH logo (blue, vector) — for HTML and Markdown |
+| `KTH_logo_RGB_bla.pdf` | KTH logo (blue, vector) — for LaTeX |
 | `consumer-example/` | Recommended layout for using this repo as a git submodule |
 
 ## Quick start (LaTeX)
@@ -69,7 +74,7 @@ md-to-pdf report.md \
   --document-title "My Document"
 ```
 
-Place `![](KTH_logo_RGB_bla.png)` as the first line of your `.md` to use the
+Place `![](KTH_logo_RGB_bla.svg)` as the first line of your `.md` to use the
 KTH logo as the title-block image. Use `<p class="subtitle">…</p>` and
 `<p class="doctype">…</p>` for the metadata lines below the title, and
 `<div class="notebox">…</div>` / `<span class="kthhl">…</span>` for the

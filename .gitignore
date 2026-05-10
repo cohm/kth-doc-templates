@@ -3,6 +3,8 @@
 *.pdf
 *.synctex.gz
 *.log
+.DS_Store
+reveal/.DS_Store
 
 # Transient: puppeteer installed by reveal/build-preview.mjs (CI + local dev)
 node_modules/

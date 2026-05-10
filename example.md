@@ -1,4 +1,4 @@
-![](KTH_logo_RGB_bla.png)
+![](KTH_logo_RGB_bla.svg)
 
 # Project Title
 

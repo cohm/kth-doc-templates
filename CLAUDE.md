@@ -145,10 +145,10 @@ Layout per slide variant (set via `data-state` on `<section>`):
 
 | variant | bg | logo | footer | line motif |
 |---------|----|------|--------|-----------|
-| cover (default) | `--kth-lightblue` | large, top-centre | — | top-left + bottom-right |
+| cover (default) | `--kth-lightblue` | large, top-centre | — | sky-blue official 16:9 |
 | (no state) | `--kth-brokenwhite` | small, top-left | author / institute / page | — |
-| divider | `--kth-sand` | small, top-left | (same) | bottom-right |
-| closing | `--kth-blue` | white, centred (CSS-masked) | — | — |
+| divider | `--kth-sand` | small, top-left | (same) | sky-blue, mirrored |
+| closing | `--kth-blue` | white, centred (filter-inverted) | — | white official 16:9 |
 
 Things to know before editing:
 
@@ -157,6 +157,26 @@ Things to know before editing:
   works. We deliberately avoid a `package.json` in the repo root to keep
   the onboarding story flat. `puppeteer` is only pulled in transiently by
   the CI preview script (`build-preview.mjs`).
+
+- **Logo asset map: vector everywhere.** Two formats for the same KTH
+  blue logo, one per toolchain's preferred format:
+  - `KTH_logo_RGB_bla.svg` (repo root + `reveal/`) — the canonical web
+    asset shipped by KTH. Used by `<img>` in `reveal/example.html` and
+    by `![]()` references in Markdown sources. ~55 KB.
+  - `KTH_logo_RGB_bla.pdf` (repo root only) — derived one-off from the
+    SVG via `inkscape --export-type=pdf`. Used by `\includegraphics`
+    in the LaTeX class. ~35 KB. RGB colour space matches the SVG, so
+    the LaTeX output is colour-faithful with the HTML/MD renders.
+  Two copies of the SVG (root + reveal/) are deliberate, not a symlink:
+  Safari ≥13 treats each `file://` URL as having a unique origin and
+  blocks parent-directory traversal even through a symlink, so
+  `<img src="../KTH_logo_RGB_bla.svg">` would silently 404 in Safari.
+  Same-directory-only references work everywhere. The class's
+  `\kthlogopath` search order (`.pdf → .png → .eps`) is unchanged —
+  we just don't ship a PNG anymore; downstream users who want to point
+  at their own raster can still drop one in alongside `\renewcommand`.
+  If KTH ever updates the logo, replace both SVGs and re-run Inkscape
+  to refresh the PDF.
 
 - **Sizing.** Base font size is `42px` and heading sizes are explicit pixel
   values (`92 / 60 / 44 / 34px` for `h1`–`h4`) — presentation-scale, not
@@ -184,9 +204,35 @@ Things to know before editing:
   widget) is the closest to the limit — keep iframe height ≤ ~580px when
   it's the slide's main content.
 
-- **White logo on the closing slide is CSS-masked** from the existing
-  blue-on-transparent `KTH_logo_RGB_bla.png`. No separate "white" file.
-  This works in Safari (note the `-webkit-mask` prefix is included).
+- **White logo on the closing slide is rendered by inverting the black SVG**
+  with `filter: brightness(0) invert(1)`. CSS filters apply to the
+  rasterised render of an `<img>` regardless of source format, so the
+  trick works identically on the SVG as it did on the PNG it replaced.
+  No separate "white" file required.
+
+- **Linjemönster (line pattern).** The 1920×1080 master is split into
+  corner-specific path groups (`KTH_PATTERN_PATHS` in `example.html`'s
+  `<script>` block). Each `.kth-pattern` instance renders only the paths
+  for its source corner, so the visible motif sits flush against the
+  slide edges — no orphan strokes through the middle the way a clipped
+  full-bleed render would have. The paths use `stroke="currentColor"`,
+  so the brand palette is applied via plain CSS (`color: var(--kth-…)`,
+  one rule per palette name). No external SVG file, no `mask-image`, no
+  `<object>` — all three were flaky over `file://`. Author API:
+  `<section data-pattern="tl, bl mirror-x" data-pattern-color="skyblue">`,
+  where `data-pattern` is a comma-separated list of pattern instances.
+  Each instance is `<source> [transforms]`: source is `tl|tr|bl|br|full`,
+  transforms compose `rotate-180 | mirror-x | mirror-y` (90°/270° aren't
+  exposed — master is 16:9). Transforms apply to the inner `<svg>` (not
+  the wrapper), so e.g. "bl mirror-x" renders only path 2 and flips it
+  horizontally, landing the BL content in the slide's BR with its
+  straight sides still flush against the slide edges. `data-pattern`
+  with no value is shorthand for `full`. Implements Brand guidelines
+  pp. 23–28 (insert / rotate-mirror / crop). The logo safe-zone patches
+  (`section[data-state="cover"]::after`, `section[data-state="closing"]::after`)
+  implement the p.27 rule "Never place the line pattern behind KTH's
+  logotype" by punching a slide-bg-coloured rectangle through the
+  pattern at the logo position.
 
 - **Slide-background colours via JS mirror.** Reveal does *not* propagate
   `data-state` from `<section>` to its generated `.slide-background` div.

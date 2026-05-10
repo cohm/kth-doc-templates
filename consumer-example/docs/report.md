@@ -1,4 +1,4 @@
-![](.templates/KTH_logo_RGB_bla.png)
+![](.templates/KTH_logo_RGB_bla.svg)
 
 # Widget Library v2 — User Guide
 
