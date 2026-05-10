@@ -52,17 +52,26 @@ auto-generated previews, see CI section).
 
 `.github/workflows/build.yml` runs on every push and PR:
 
-1. Builds `example.tex` (pdflatex), `example.md` (md-to-pdf), and the
-   consumer-example via its Makefile — each is a smoke test of one flow.
-2. Renders first-page PNG previews of the two `example.*` outputs at 150 dpi
-   via `pdftoppm`, into `docs/preview/example-{tex,md}.png`.
-3. Uploads all PDFs as a workflow artefact (`pdfs`).
-4. **On push to main only:** commits the regenerated PNGs back to
-   `docs/preview/` with `[skip ci]`. The `paths-ignore: ['docs/preview/**']`
-   filter on the workflow prevents the auto-commit from triggering itself.
+1. Builds `example.tex` (pdflatex), `example.md` (md-to-pdf), the
+   consumer-example via its Makefile, and the reveal deck's print-PDF
+   export via Puppeteer (`reveal/build-preview.mjs`). Each step is a
+   smoke test of one flow.
+2. Renders first-page PNG previews of the two `example.*` PDFs at 150
+   dpi via `pdftoppm`, into `docs/preview/example-{tex,md}.png`. The
+   reveal flow no longer produces a preview PNG — the live deck on
+   GitHub Pages serves that purpose now.
+3. Uploads all PDFs (incl. `example-reveal.pdf`) as a workflow artefact.
+4. **On push to main only:** commits the regenerated LaTeX/Markdown
+   PNGs back to `docs/preview/` with `[skip ci]`. The
+   `paths-ignore: ['docs/preview/**']` filter on the workflow prevents
+   the auto-commit from triggering itself.
 
-The `README.md` references those PNGs directly, so the README always shows
-the current state of the templates.
+The interactive reveal deck is published via GitHub Pages at
+`https://cohm.github.io/kth-doc-templates/reveal/example.html` (deploy
+from `main`, root). README links there directly. The LaTeX/Markdown
+README previews still reference `docs/preview/example-{tex,md}.png` so
+they always reflect the current state of those flows without leaving
+github.com.
 
 ## Architecture of `kth-document.cls`
 

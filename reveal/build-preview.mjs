@@ -1,13 +1,18 @@
 #!/usr/bin/env node
 /**
- * Build a first-slide PNG preview and a print-PDF export of the reveal.js deck.
+ * Build a print-PDF export of the reveal.js deck.
  *
  * Outputs:
- *   docs/preview/example-reveal.png   (screenshot of the cover slide)
- *   example-reveal.pdf                (full deck via reveal's ?print-pdf mode)
+ *   example-reveal.pdf   (full deck via reveal's ?print-pdf mode)
+ *
+ * The deck's interactive preview is now served live via GitHub Pages
+ * (https://cohm.github.io/kth-doc-templates/reveal/example.html), so a
+ * static cover-slide screenshot is no longer needed for the README. The
+ * PDF stays useful as a workflow artefact (downloadable handout) and
+ * as a smoke test that the deck renders end-to-end without errors.
  *
  * Spins up a tiny static HTTP server rooted at the repo root so that
- * sibling assets (KTH_logo_RGB_bla.png, widgets/*) resolve correctly.
+ * sibling assets (KTH_logo_RGB_bla.svg, widgets/*) resolve correctly.
  *
  * Run from the repo root:
  *   node reveal/build-preview.mjs
@@ -17,7 +22,6 @@
 
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { mkdir }    from 'node:fs/promises';
 import { extname, resolve, normalize, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import puppeteer from 'puppeteer';
@@ -70,27 +74,7 @@ async function main() {
   });
 
   try {
-    await mkdir(resolve(REPO_ROOT, 'docs/preview'), { recursive: true });
-
-    // ----- 1. Screenshot the cover slide ---------------------------------
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
-    await page.goto(`http://localhost:${PORT}/reveal/example.html`, {
-      waitUntil: 'networkidle0',
-      timeout: 60000,
-    });
-    // Wait for fonts and the cover-slide entry animations to settle.
-    await page.evaluate(() => document.fonts ? document.fonts.ready : null);
-    await new Promise(r => setTimeout(r, 1500));
-    await page.screenshot({
-      path: resolve(REPO_ROOT, 'docs/preview/example-reveal.png'),
-      fullPage: false,
-      omitBackground: false,
-    });
-    console.log('wrote docs/preview/example-reveal.png');
-    await page.close();
-
-    // ----- 2. Print-PDF export -------------------------------------------
+    // ----- Print-PDF export ----------------------------------------------
     const pdfPage = await browser.newPage();
     await pdfPage.setViewport({ width: 1920, height: 1080, deviceScaleFactor: 1 });
     await pdfPage.goto(`http://localhost:${PORT}/reveal/example.html?print-pdf`, {

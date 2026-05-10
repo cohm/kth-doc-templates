@@ -8,17 +8,19 @@ memos, slide decks, as a git submodule for package documentation, etc.
 
 ## Previews
 
-| LaTeX (`example.tex` → lualatex) | Markdown (`example.md` → md-to-pdf) | Slides ([live deck][live]) |
+| LaTeX (`example.tex` → lualatex) | Markdown (`example.md` → md-to-pdf) | Slides (`reveal/example.html`) |
 |----------------------------------|--------------------------------------|--------------------------------|
-| ![](docs/preview/example-tex.png) | ![](docs/preview/example-md.png) | ![](docs/preview/example-reveal.png) |
+| ![](docs/preview/example-tex.png) | ![](docs/preview/example-md.png) | **[▶ Live deck][live]** |
 
 [live]: https://cohm.github.io/kth-doc-templates/reveal/example.html
 
-The previews above are regenerated automatically by CI on every push to
-`main`, so they always reflect the current state of the templates. PDFs
-from each CI run are available as workflow artefacts. The reveal deck is
-also served live via GitHub Pages at the [link above][live] — interact
-with the animations, transitions, and embedded widgets in your browser.
+The LaTeX and Markdown previews above are regenerated automatically by
+CI on every push to `main`, so they always reflect the current state of
+the templates. The reveal deck is served live via GitHub Pages
+([link][live]) — open it in your browser to interact with the
+animations, transitions, and embedded widgets. PDFs from each CI run
+(including a static print-pdf export of the deck) are available as
+workflow artefacts.
 
 ## Files
 

@@ -90,17 +90,17 @@ jobs:
         run: make -C consumer-example/docs LATEX=lualatex
 
       # --------------------------------------------------------------- #
-      # Build the reveal.js slide deck — first-slide PNG + print-PDF.    #
-      # build-preview.mjs spins up a static server, drives Puppeteer,    #
-      # screenshots slide 1, and exports the deck via reveal's           #
-      # ?print-pdf mode.                                                 #
+      # Build the reveal.js print-PDF export. Smoke-tests that the deck #
+      # renders end-to-end without errors and produces a downloadable   #
+      # static handout. The interactive deck is served live via Pages,  #
+      # so we no longer screenshot a cover slide for the README.        #
       # --------------------------------------------------------------- #
-      - name: Build reveal slides preview
+      - name: Build reveal slides PDF
         run: node reveal/build-preview.mjs
 
       # --------------------------------------------------------------- #
-      # Render first-page PNG previews for the README                    #
-      # (the reveal preview is written directly by build-preview.mjs)    #
+      # Render first-page PNG previews for the README (LaTeX + Markdown #
+      # only — the reveal flow's preview is the live Pages deployment). #
       # --------------------------------------------------------------- #
       - name: Render LaTeX/Markdown preview PNGs
         run: |
