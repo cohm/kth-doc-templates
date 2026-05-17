@@ -618,6 +618,43 @@ print(measure().mean(), KTH_BLUE)
   Reveal.on('slidechanged', mirrorStateToBackgrounds);
 
   // --------------------------------------------------------------------- //
+  // Auto-fit slide titles                                                 //
+  //                                                                       //
+  // If an <h1> would wrap onto a second line, shrink its font-size so it //
+  // fits on one line. Measured by toggling white-space:nowrap, reading   //
+  // scrollWidth against the parent's clientWidth, and scaling font-size  //
+  // proportionally with a hard floor so we never shrink to illegibility. //
+  // Re-runs on every slide change so auto-animated sibling slides — and  //
+  // any title swapped in at runtime — are each sized independently.      //
+  // --------------------------------------------------------------------- //
+  function fitTitle(h) {
+    h.style.fontSize = '';
+    const prevWhiteSpace = h.style.whiteSpace;
+    h.style.whiteSpace = 'nowrap';
+    const natural = h.scrollWidth;
+    const avail   = h.parentElement.clientWidth;
+    h.style.whiteSpace = prevWhiteSpace;
+    if (avail > 0 && natural > avail) {
+      const fs = parseFloat(window.getComputedStyle(h).fontSize);
+      // Target 96 % of avail to leave a hair of margin for kerning rounding.
+      const scaled = (avail * 0.96) / natural * fs;
+      h.style.fontSize = Math.max(scaled, 56) + 'px';
+    }
+  }
+  function fitAllTitles() {
+    document.querySelectorAll('.reveal .slides section h1').forEach(fitTitle);
+  }
+  function fitWhenReady() {
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(fitAllTitles);
+    } else {
+      fitAllTitles();
+    }
+  }
+  Reveal.on('ready',        fitWhenReady);
+  Reveal.on('slidechanged', fitWhenReady);
+
+  // --------------------------------------------------------------------- //
   // Stagger swatch entry per palette grid                                  //
   // --------------------------------------------------------------------- //
   function staggerSwatches(el, step = 0.05, base = 0.05) {
