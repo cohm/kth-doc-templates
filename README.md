@@ -95,7 +95,8 @@ open reveal/example.html       # macOS, double-click also works
 reveal.js itself loads from a CDN, so there's nothing to install. To export
 the deck as PDF, append `?print-pdf` to the URL and use the browser's "Save
 as PDF" with paper size 1920×1080, no margins, and "Background graphics"
-turned on. CI does this automatically (see workflow artefacts).
+turned on (works well in Chrome under macos, use the system print dialog). 
+CI does this automatically (see workflow artefacts).
 
 The slide theme follows the official KTH PowerPoint master (per the
 [kthpq](https://github.com/th-rtyf-re/kthpq) Beamer port): light-blue cover
