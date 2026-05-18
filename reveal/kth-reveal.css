@@ -148,18 +148,19 @@ html:not(.reveal-print) .reveal {
 
 .reveal p { margin: 0 0 0.6em; }
 
-/* Hanging-indent lists: the bullet/number sits at the same x as ordinary
-   body text, and the item text is indented past it (wrapped lines too).
-   Achieved by zeroing the default ul/ol padding, moving the marker
-   in-flow (`list-style-position: inside`), then pulling the first line
-   back by the same amount the li is padded — so the marker lands at
-   the li's left edge while wrapped lines stay at padding-left. */
+/* Hanging-indent lists: the marker sits in the ul's left-gutter (the
+   ul's padding-left), the first line of text starts where the gutter
+   ends, and wrapped lines align with that same x — so the bullet
+   "hangs" left of a clean text column.
+   Earlier attempt used `list-style-position: inside` + `text-indent: -1.5em`
+   so the marker would align with the parent's body text, but bullet
+   markers are narrower than 1.5em which left wrapped lines indented
+   past the first line. Reverted to the standard outside-marker pattern. */
 .reveal ul, .reveal ol {
   margin: 0.4em 0 0.8em;
-  padding-left: 0;
-  list-style-position: inside;
+  padding-left: 1.5em;
 }
-.reveal li          { margin: 0.45em 0; padding-left: 1.5em; text-indent: -1.5em; }
+.reveal li          { margin: 0.45em 0; }
 .reveal ul li::marker { color: var(--kth-navy); }
 .reveal ol li::marker { color: var(--kth-navy); font-weight: 600; }
 
