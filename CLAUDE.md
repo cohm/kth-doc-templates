@@ -4,21 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-KTH document templates for three toolchains, sharing the same KTH Graphical
+KTH document templates for four toolchains, sharing the same KTH Graphical
 Profile (Grafisk manual v1.2, 2024):
 
 - **LaTeX** — `kth-document.cls` + `example.tex`. Compile with pdflatex / xelatex / lualatex.
-- **Markdown** — `md-to-pdf.{json,css}` + `example.md`. Render with [md-to-pdf](https://github.com/simonhaenisch/md-to-pdf) (Puppeteer-backed).
-- **Slides** — `reveal/kth-reveal.css` + `reveal/example.html`. Open directly in a browser; reveal.js loads from CDN. Print-PDF via `?print-pdf` query.
+- **Markdown documents** — `md-to-pdf.{json,css}` + `example.md`. Render with [md-to-pdf](https://github.com/simonhaenisch/md-to-pdf) (Puppeteer-backed).
+- **HTML slides** — `reveal/kth-reveal.css` + `reveal/example.html`. Open directly in a browser; reveal.js loads from CDN. Print-PDF via `?print-pdf` query.
+- **Markdown slides** — `slides-md/example.md` + a thin `example.html` shell. Same reveal.js theme as the HTML deck, but content is authored in markdown and loaded at runtime by reveal.js's markdown plugin.
 
-All three flows are kept visually aligned: same palette, same Figtree-headings /
+All four flows are kept visually aligned: same palette, same Figtree-headings /
 Georgia-body fonts, same heading hierarchy and metadata block, so the
 rendered outputs of the same content look like siblings.
 
-`example.tex`, `example.md`, and `reveal/example.html` are all both the
-user-facing manual *and* the smoke test. `consumer-example/` shows the
-recommended layout for downstream packages that include this repo as a git
-submodule.
+`example.tex`, `example.md`, `reveal/example.html`, and `slides-md/example.md`
+are all both the user-facing manual *and* the smoke test. `consumer-example/`
+shows the recommended layout for downstream packages that include this repo
+as a git submodule.
 
 ## Build
 
@@ -31,10 +32,14 @@ xelatex  example.tex     # exact KTH fonts via fontspec
 # Markdown
 md-to-pdf example.md --config-file md-to-pdf.json --document-title "Project Title"
 
-# Slides
+# Slides (HTML-authored)
 open reveal/example.html                                       # live preview
 npm install --no-save puppeteer                                # one-time, in repo root
-node reveal/build-preview.mjs                                  # → docs/preview/example-reveal.png + example-reveal.pdf
+node reveal/build-preview.mjs                                  # → example-reveal.pdf
+
+# Slides (Markdown-authored — same theme, markdown source)
+open slides-md/example.html                                    # live preview
+node slides-md/build-preview.mjs                               # → example-md-reveal.pdf
 
 # Consumer example (exercises the submodule pattern via a .templates symlink)
 make -C consumer-example/docs
@@ -53,14 +58,16 @@ auto-generated previews, see CI section).
 `.github/workflows/build.yml` runs on every push and PR:
 
 1. Builds `example.tex` (pdflatex), `example.md` (md-to-pdf), the
-   consumer-example via its Makefile, and the reveal deck's print-PDF
-   export via Puppeteer (`reveal/build-preview.mjs`). Each step is a
+   consumer-example via its Makefile, the reveal deck's print-PDF
+   export (`reveal/build-preview.mjs`), and the markdown-driven deck's
+   print-PDF export (`slides-md/build-preview.mjs`). Each step is a
    smoke test of one flow.
 2. Renders first-page PNG previews of the two `example.*` PDFs at 150
-   dpi via `pdftoppm`, into `docs/preview/example-{tex,md}.png`. The
-   reveal flow no longer produces a preview PNG — the live deck on
-   GitHub Pages serves that purpose now.
-3. Uploads all PDFs (incl. `example-reveal.pdf`) as a workflow artefact.
+   dpi via `pdftoppm`, into `docs/preview/example-{tex,md}.png`. Neither
+   reveal flow produces a preview PNG — the live deck on GitHub Pages
+   serves that purpose now.
+3. Uploads all PDFs (incl. `example-reveal.pdf` and
+   `example-md-reveal.pdf`) as a workflow artefact.
 4. **On push to main only:** commits the regenerated LaTeX/Markdown
    PNGs back to `docs/preview/` with `[skip ci]`. The
    `paths-ignore: ['docs/preview/**']` filter on the workflow prevents
@@ -267,6 +274,78 @@ Things to know before editing:
   `example-reveal.pdf`. The GH workflow installs puppeteer into
   `$RUNNER_TEMP/puppeteer-deps` and points `NODE_PATH` at it.
 
+- **Manual PDF export needs Chrome on macOS.** Reveal's `?print-pdf`
+  layout produces a body sized 1920×1080 CSS px = 20″ × 11.25″ at the
+  spec'd 96 dpi. Browsers handle this differently:
+  - Chrome ships its own print UI with a "1920×1080" preset that's
+    actually 20″ × 11.25″ — and CI's Chromium-via-Puppeteer produces
+    the canonical export.
+  - Safari uses macOS's native print dialog, which **honours OS custom
+    paper presets over the CSS `@page` rule**. A user-created
+    "1920×1080" preset in macOS is often stored as 1920×1080 *dots* at
+    300 dpi = 163×91mm — way too small, slides spill across 3 PDF
+    pages each. Fix is to recreate the preset at 508×286mm (= 20×11.25
+    inches). We tried adding a static `@page { size: 20in 11.25in }`
+    rule to override this; doesn't help because the dialog wins.
+  - Firefox doesn't expose 1920×1080 as a preset at all.
+  Applies equally to the HTML and markdown decks. README quick-starts
+  document the workaround.
+
+## Markdown-driven slides (`slides-md/`)
+
+A parallel slide deck that authors content in markdown instead of HTML
+while reusing the reveal.js theme verbatim. Reveal.js's built-in
+markdown plugin loads `example.md` at runtime, splits it on `---`
+separators into `<section>` elements, and the existing
+`kth-reveal.js` runtime drops the KTH chrome (logo, footer, line
+pattern) onto each one. Same `data-state`, `data-pattern`, `kthhl`,
+`cols-2`, etc. — same visual output.
+
+Things to know before editing:
+
+- **Assets are symlinked into `../reveal/`.** `slides-md/kth-reveal.css`,
+  `kth-reveal.js`, `KTH_logo_RGB_bla.svg`, and `widgets/orbit.html` are
+  symlinks to their `reveal/` counterparts — no duplication, no drift.
+  The root-vs-`reveal/` SVG copy still exists as actual duplication
+  because the `reveal/` HTML deck genuinely works over `file://` and
+  Safari blocks parent-directory traversal across `file://` origins;
+  but the markdown deck can't run over `file://` regardless (see the
+  next bullet), so the same constraint doesn't apply here. Symlinks
+  resolve cleanly under the local HTTP server used for preview and
+  PDF export, and under the same server reveal's CI Puppeteer
+  pipeline drives.
+
+- **`kth-reveal.js` defers chrome injection for markdown decks.** The
+  runtime's `boot()` looks for a `<section data-markdown>` placeholder
+  in the DOM at `DOMContentLoaded`; when present, it postpones
+  `injectMasterChrome()` to `Reveal.on('ready')`, by which time the
+  markdown plugin has split `example.md` into real sections. Hand-
+  authored decks (no placeholder) keep the original synchronous path
+  — both styles work from a single runtime.
+
+- **Per-slide variants and patterns** are set via the reveal markdown
+  plugin's `<!-- .slide: data-state="…" data-pattern="…" -->` HTML-
+  comment syntax, placed anywhere within the slide block. Element
+  classes use `<!-- .element: class="fragment" -->` immediately after
+  the element. Raw HTML (palette grids, multi-column blocks, iframe
+  widgets) passes through unchanged — `example.md` shows the
+  pragmatic blend of markdown plus inline HTML.
+
+- **No `file://` preview.** Unlike `reveal/example.html`, the markdown
+  deck can't be opened by double-clicking it — the markdown plugin's
+  `fetch('example.md')` is blocked by browsers under the `file://`
+  origin. A local HTTP server is required for both live preview and
+  PDF export (`npx http-server`, `python3 -m http.server`, etc.).
+  This breaks the repo's "open and view" convention specifically for
+  this flow; the README quick-start documents the workaround.
+
+- **PDF export.** `slides-md/build-preview.mjs` mirrors
+  `reveal/build-preview.mjs` (separate file, ~95% identical) and
+  outputs `example-md-reveal.pdf`. The static HTTP server it spins up
+  is essential for the same `fetch()` reason. Local browser PDF
+  export via `?print-pdf` + Cmd/Ctrl+P works identically to the HTML
+  deck once a server is running.
+
 ## Consumer-example pattern
 
 `consumer-example/docs/.templates` is a symlink to `../..` (the repo root).
@@ -286,6 +365,10 @@ defeats the purpose of the smoke test.
   feature, document it in the relevant `example.*` and in `README.md`. Keep
   the two examples in sync — same sections, same content shape — so the
   preview images stay comparable.
+- `slides-md/kth-reveal.{css,js}`, `slides-md/KTH_logo_RGB_bla.svg`,
+  and `slides-md/widgets/orbit.html` are symlinks into `reveal/`.
+  Edit the `reveal/` originals; changes propagate to `slides-md/`
+  automatically.
 - LaTeX internal macros use the `\@kth…` / `\kth@…` namespace; public macros
   are un-prefixed (`\subtitle`, `\doctype`, `\shorttitle`, `\version`,
   `\affiliation`, `\kthhl`, `\kthlogopath`, `\kthlogoheight`).

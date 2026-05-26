@@ -242,17 +242,32 @@
   // Boot. injectMasterChrome touches the DOM directly, so defer until    //
   // DOMContentLoaded if loaded from <head>. Reveal handlers are queued  //
   // immediately and fire whenever Reveal becomes ready.                  //
+  //                                                                       //
+  // Markdown-driven decks (`<section data-markdown="…">`) don't have the //
+  // real <section>s in the DOM yet at DOMContentLoaded — the markdown    //
+  // plugin generates them at Reveal.initialize time, *after* both        //
+  // DOMContentLoaded and window.load. Detect that case and defer both    //
+  // the chrome injector and the KaTeX renderer to Reveal.on('ready'),    //
+  // so they run on the real sections. Hand-authored decks keep the       //
+  // synchronous paths.                                                    //
   // --------------------------------------------------------------------- //
   function boot() {
-    injectMasterChrome();
+    const hasMarkdownPlaceholder =
+      document.querySelector('.reveal .slides > section[data-markdown]');
+    if (hasMarkdownPlaceholder && typeof Reveal !== 'undefined') {
+      Reveal.on('ready', injectMasterChrome);
+      Reveal.on('ready', renderKatex);
+    } else {
+      injectMasterChrome();
+      if (document.readyState === 'complete') renderKatex();
+      else window.addEventListener('load', renderKatex);
+    }
     if (typeof Reveal !== 'undefined') {
       Reveal.on('ready',        mirrorStateToBackgrounds);
       Reveal.on('slidechanged', mirrorStateToBackgrounds);
       Reveal.on('ready',        fitWhenReady);
       Reveal.on('slidechanged', fitWhenReady);
     }
-    if (document.readyState === 'complete') renderKatex();
-    else window.addEventListener('load', renderKatex);
   }
 
   if (document.readyState === 'loading') {

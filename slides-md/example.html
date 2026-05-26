@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KTH markdown slides — Example deck</title>
+
+  <!--
+    KTH markdown-driven slides — thin HTML shell.
+
+    The slide content lives in example.md (sibling file). This file's
+    only job is to bootstrap reveal.js + the markdown plugin and apply
+    deck-wide metadata (author, institute). The KTH chrome (logo,
+    footer, line pattern) is injected at runtime by kth-reveal.js.
+
+    Preview / print to PDF:
+      THIS FILE NEEDS A LOCAL HTTP SERVER — the reveal.js markdown plugin
+      loads example.md via fetch(), which browsers block under file://.
+
+      Start a static server:                 npx http-server -p 8080 .
+                                             (or python3 -m http.server 8080)
+      Open in browser:                       http://localhost:8080/slides-md/example.html
+      Print to PDF (Chrome recommended):     append ?print-pdf, then ⌘/Ctrl+P → Save as PDF
+                                             (1920×1080 paper, no margins, "Background graphics" on)
+                                             On macOS, Safari uses the OS print dialog's paper
+                                             preset over CSS — check that your "1920×1080"
+                                             custom paper size is actually 508×286mm physical
+                                             (= 1920×1080 at 96 dpi). See README.md.
+      Unattended PDF export:                 node slides-md/build-preview.mjs
+                                             → example-md-reveal.pdf in repo root
+
+    Authoring lives in example.md — open it for the full cheatsheet
+    (slide separators, data-state variants, line-pattern syntax, element
+    classes, when to drop into raw HTML).
+  -->
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.css">
+
+  <!-- Figtree as a real <link> so it loads via the browser's font pipeline
+       (more reliable than the @import in kth-reveal.css over file://). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap">
+
+  <!-- KaTeX for inline LaTeX math via $…$ delimiters (auto-rendered after
+       Reveal initialises so all slides — including off-screen ones — get
+       processed in a single pass). -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+
+  <link rel="stylesheet" href="kth-reveal.css">
+</head>
+<body>
+
+<div class="reveal"
+     data-kth-author="Firstname Lastname"
+     data-kth-institute="School of Engineering Sciences (SCI), KTH"
+     data-kth-affiliation-short="SCI">
+
+  <!--
+    Master chrome (small KTH logo top-left, large logo top-centre on the
+    cover, white logo centred on the closing slide, sky-blue footer) is
+    injected per-section by injectMasterChrome() in kth-reveal.js. For
+    markdown-driven decks, kth-reveal.js detects the data-markdown
+    placeholder below and defers injection to Reveal.on('ready') — by
+    which time the markdown plugin has split example.md into real
+    <section> elements.
+
+    Set the deck-wide author / institute via the data-kth-* attributes
+    on .reveal above.
+  -->
+
+  <div class="slides">
+    <section data-markdown="example.md"
+             data-separator="^\r?\n---\r?\n$"
+             data-separator-vertical="^\r?\n--\r?\n$"
+             data-separator-notes="^Note:"></section>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/markdown/markdown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.2.1/plugin/notes/notes.js"></script>
+
+<!-- Shared KTH runtime: master chrome (logo + footer), line pattern,
+     slide-background state mirror, auto-fit titles, KaTeX render hook.
+     Must load AFTER reveal.js so it can register Reveal.on handlers, and
+     BEFORE the inline Reveal.initialize() below so those handlers are
+     queued in time for the 'ready' event. -->
+<script src="kth-reveal.js"></script>
+
+<script>
+  Reveal.initialize({
+    width: 1920,
+    height: 1080,
+    margin: 0.0,
+
+    // Top-align content slides — cover/divider/closing handle their own
+    // vertical layout via padding in kth-reveal.css.
+    center: false,
+
+    controls: true,
+    controlsTutorial: false,
+    progress: false,
+    history: true,
+    hash: true,
+
+    // We render our own KTH footer; reveal's slide-number is hidden in CSS.
+    slideNumber: false,
+
+    transition: 'slide',
+    transitionSpeed: 'default',
+    backgroundTransition: 'fade',
+
+    pdfSeparateFragments: false,
+
+    plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+  });
+</script>
+
+</body>
+</html>
