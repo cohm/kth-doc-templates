@@ -99,6 +99,14 @@ jobs:
         run: node reveal/build-preview.mjs
 
       # --------------------------------------------------------------- #
+      # Build the markdown-driven reveal slides PDF. Same Puppeteer     #
+      # pipeline as above, but the slide source is slides-md/example.md #
+      # loaded at runtime by reveal.js's markdown plugin.               #
+      # --------------------------------------------------------------- #
+      - name: Build markdown-driven reveal slides PDF
+        run: node slides-md/build-preview.mjs
+
+      # --------------------------------------------------------------- #
       # Render first-page PNG previews for the README (LaTeX + Markdown #
       # only — the reveal flow's preview is the live Pages deployment). #
       # --------------------------------------------------------------- #
@@ -121,6 +129,7 @@ jobs:
             example-tex.pdf
             example-md.pdf
             example-reveal.pdf
+            example-md-reveal.pdf
             consumer-example/docs/*.pdf
             docs/preview/*.png
 

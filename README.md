@@ -1,7 +1,8 @@
 # kth-document — KTH Document Templates
 
 Professional KTH document templates for **LaTeX**, **Markdown**, and
-**reveal.js slide decks**, all implementing the
+**reveal.js slide decks** (authored in HTML *or* markdown), all
+implementing the
 [KTH Graphical Profile](https://intra.kth.se/administration/kommunikation/varumarke/grafiskprofil)
 (Grafisk manual v1.2, 2024). Use them for project descriptions, 
 memos, slide decks, as a git submodule for package documentation, etc.
@@ -31,6 +32,7 @@ workflow artefacts.
 | `reveal/kth-reveal.css` | reveal.js theme — used by `reveal/example.html` |
 | `reveal/example.html` | Annotated reveal.js example deck / starting point |
 | `reveal/widgets/` | Drop-in interactive widgets embedded via `<iframe>` |
+| `slides-md/example.md` + `example.html` | Markdown-driven slide deck — same theme, markdown source |
 | `example.tex`, `example.md` | Fully annotated examples / starting points |
 | `KTH_logo_RGB_bla.svg` | KTH logo (blue, vector) — for HTML and Markdown |
 | `KTH_logo_RGB_bla.pdf` | KTH logo (blue, vector) — for LaTeX |
@@ -95,8 +97,29 @@ open reveal/example.html       # macOS, double-click also works
 reveal.js itself loads from a CDN, so there's nothing to install. To export
 the deck as PDF, append `?print-pdf` to the URL and use the browser's "Save
 as PDF" with paper size 1920×1080, no margins, and "Background graphics"
-turned on (works well in Chrome under macos, use the system print dialog). 
-CI does this automatically (see workflow artefacts).
+turned on.
+
+**Use Chrome on macOS for PDF export.** Other browsers have rough
+edges that make 1920×1080 awkward:
+
+- **Chrome** has its own print UI with a built-in "1920×1080" preset
+  that's actually 20″ × 11.25″ (1920×1080 CSS px at 96 dpi). Just
+  works. CI uses Chromium via Puppeteer for the same reason.
+- **Safari** uses macOS's native print dialog, which honours the OS's
+  custom-paper presets over the CSS `@page` rule. If you've made a
+  macOS preset called "1920×1080", **check its physical size**: it's
+  often stored at 1920×1080 *dots* at 300 dpi = 163mm × 91mm, which
+  shrinks each slide across ~3 pages. The correct physical size is
+  **508mm × 285.75mm** (or **20.0 in × 11.25 in**). Fix it under
+  *File → Print → Paper Size → Manage Custom Sizes…* — or just use
+  Chrome.
+- **Firefox** doesn't expose a 1920×1080 paper preset at all, so
+  you'd have to define a custom size manually each time and even then
+  its `@page` handling is patchy.
+
+For unattended export — same Chromium pipeline as CI — run
+`node reveal/build-preview.mjs` from the repo root after a one-time
+`npm install --no-save puppeteer`.
 
 The slide theme follows the official KTH PowerPoint master (per the
 [kthpq](https://github.com/th-rtyf-re/kthpq) Beamer port): light-blue cover
@@ -127,6 +150,66 @@ Authoring cheatsheet:
 - `<iframe class="widget" data-src="widgets/foo.html">` — embed an
   interactive widget (Claude Design widget, custom web app, …); reveal
   pauses off-screen iframes to keep CPU cool
+
+## Quick start (Markdown slides)
+
+If you'd rather write slides in markdown than HTML, `slides-md/` ships a
+parallel deck that uses reveal.js's built-in markdown plugin. Same KTH
+chrome, same brand variants — just a different source format.
+
+Unlike the HTML deck, the markdown deck needs a local HTTP server: the
+reveal.js markdown plugin loads `example.md` via `fetch()`, which is
+blocked under `file://` by all browsers. Any static server works:
+
+```bash
+npx http-server -p 8080 .                # → http://localhost:8080/slides-md/example.html
+# or: python3 -m http.server 8080
+```
+
+Append `?print-pdf` to the URL for the print-PDF layout, then Cmd/Ctrl-P
+→ Save as PDF (1920×1080 paper, no margins, "Background graphics" on).
+The same browser caveat applies as for the HTML deck — **use Chrome on
+macOS**; Safari and Firefox struggle with the 1920×1080 paper size (see
+the Slides section above for details).
+
+For unattended export use the Puppeteer script (same Chromium pipeline
+as CI):
+
+```bash
+npm install --no-save puppeteer          # one-time, in repo root
+node slides-md/build-preview.mjs         # → example-md-reveal.pdf
+```
+
+Authoring is plain markdown plus a handful of HTML-comment annotations:
+
+```markdown
+<!-- .slide: data-state="cover" data-pattern="tl, bl mirror-x" data-pattern-color="skyblue" -->
+
+# Project Title
+
+<p class="subtitle">Subtitle text</p>
+
+---
+
+<p class="section-name">Section · Topic</p>
+
+# Slide heading
+
+- A bullet
+- A fragment <!-- .element: class="fragment fade-in" -->
+
+Inline <span class="kthhl">keyword highlight</span>, math $E=mc^2$,
+and `code` all work out of the box.
+```
+
+`<!-- .slide: -->` comments set per-slide variants and patterns;
+`<!-- .element: -->` annotates the preceding element with classes
+(e.g. `fragment`). Drop into raw HTML when markdown can't express the
+layout (palette grids, multi-column blocks, iframe widgets) — the
+plugin passes inline HTML through.
+
+See `slides-md/example.md` for the full authoring cheatsheet and a
+slide-by-slide demonstration of every brand component.
 
 ## Use as a git submodule
 
