@@ -81,7 +81,17 @@
     // after the name. The long form (data-kth-institute) drives the cover
     // meta paragraph instead.
     const namePlusAff = author + (affShort ? ' (' + affShort + ')' : '');
-    const sections = document.querySelectorAll('.reveal .slides > section');
+    // Leaf slides only. In a 2D deck (reveal vertical stacks), a top-level
+    // section that contains child sections is a *stack* — a column
+    // container, not a slide itself; reveal only renders its children. So
+    // we inject chrome onto every section that has no nested <section>,
+    // walking one level into each stack. That gives every vertical
+    // sub-slide the same logo / footer / page number as a top-level slide,
+    // and numbers them sequentially in reading order (columns
+    // left-to-right, slides top-to-bottom). A flat deck has no stacks, so
+    // this set is identical to the old `.slides > section`.
+    const sections = [...document.querySelectorAll('.reveal .slides section')]
+      .filter((s) => !s.querySelector(':scope > section'));
     const total = sections.length;
     sections.forEach((section, i) => {
       const state = section.dataset.state;

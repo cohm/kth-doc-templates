@@ -21,6 +21,16 @@
       <section data-state="closing">        KTH-blue end slide, white logo centred
       (no data-state)                       white content master, logo top-left, footer
 
+    Deck structure — 2D / vertical stacks:
+      Nest <section>s inside a parent <section> to make a column. Arrow
+      keys then move LEFT/RIGHT between columns and UP/DOWN within one,
+      and the overview map (Esc) lays the deck out as a grid. Here each
+      KTH section — a divider plus the content slides under it — is one
+      column; the cover and closing are single-slide columns. The KTH
+      chrome (logo, footer, sequential N/total page number) is injected
+      on every leaf slide, nested or not, so a 2D deck looks identical
+      to a flat one slide-for-slide.
+
       data-pattern="tl, bl mirror-x"         line pattern (linjemönster) — comma-separated
                                              list of <source> [transforms] items.
                                              source: tl|tr|bl|br|full
@@ -105,8 +115,26 @@
     </section>
 
     <!-- ==================================================================
-         2. Heading hierarchy — proves the visual ratios match LaTeX/Markdown
+         Column 2 — Identity (vertical stack).
+
+         Wrapping these slides in one parent <section> makes them a single
+         column: navigate RIGHT from the cover to reach it, then DOWN to
+         move through the slides within. The divider heads the column; the
+         content slides stack beneath it. The KTH chrome (logo, footer,
+         sequential page number) is injected on each nested leaf slide by
+         kth-reveal.js, exactly as on a flat deck.
          ================================================================== -->
+    <section>
+
+    <!-- ---- Section divider — Identity ---- -->
+    <section data-state="divider" data-transition="convex"
+             data-pattern="full" data-pattern-color="skyblue">
+      <p class="eyebrow">Part 1 of 2</p>
+      <h2>Identity</h2>
+      <p class="lead">Colour, type, and layout from the KTH Grafisk manual&nbsp;v1.2 (2024).</p>
+    </section>
+
+    <!-- ---- Heading hierarchy — proves the visual ratios match LaTeX/Markdown ---- -->
     <section>
       <p class="section-name">Identity · Typography</p>
       <h1>Heading hierarchy</h1>
@@ -122,16 +150,6 @@
         All sizes scale from <code>--r-main-font-size: 30px</code>. Headings and
         body both use <span class="kthhl">Figtree</span>.
       </p>
-    </section>
-
-    <!-- ==================================================================
-         3. Section divider — Identity
-         ================================================================== -->
-    <section data-state="divider" data-transition="convex"
-             data-pattern="full" data-pattern-color="skyblue">
-      <p class="eyebrow">Part 1 of 2</p>
-      <h2>Identity</h2>
-      <p class="lead">Colour, type, and layout from the KTH Grafisk manual&nbsp;v1.2 (2024).</p>
     </section>
 
     <!-- ==================================================================
@@ -348,9 +366,15 @@ print(measure().mean(), KTH_BLUE)
       </div>
     </section>
 
+    </section>
+    <!-- /Column 2 — Identity stack -->
+
     <!-- ==================================================================
-         10. Section divider — Interactivity
+         Column 3 — Interactivity (vertical stack)
          ================================================================== -->
+    <section>
+
+    <!-- ---- Section divider — Interactivity ---- -->
     <section data-state="divider" data-transition="convex"
              data-pattern="full" data-pattern-color="skyblue">
       <p class="eyebrow">Part 2 of 2</p>
@@ -428,8 +452,11 @@ print(measure().mean(), KTH_BLUE)
       </div>
     </section>
 
+    </section>
+    <!-- /Column 3 — Interactivity stack -->
+
     <!-- ==================================================================
-         13. Closing — KTH-blue, white logo centred
+         Column 4 — Closing — KTH-blue, white logo centred
          ================================================================== -->
     <section data-state="closing" data-transition="zoom"
              data-pattern="tl, bl mirror-x" data-pattern-color="white">

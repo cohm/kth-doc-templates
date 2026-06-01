@@ -151,6 +151,15 @@ Authoring cheatsheet:
   interactive widget (Claude Design widget, custom web app, …); reveal
   pauses off-screen iframes to keep CPU cool
 
+**2D layout (vertical stacks).** Nest `<section>`s inside a parent
+`<section>` to make a column: arrow keys then move left/right between
+columns and up/down within one, and the overview map (Esc) shows the
+deck as a grid. The example deck uses one column per KTH section — each
+divider plus the content slides beneath it. The KTH chrome (logo,
+footer, sequential `N / total` page number) is injected on every leaf
+slide, nested or not, so a 2D deck is identical to a flat one
+slide-for-slide.
+
 ## Quick start (Markdown slides)
 
 If you'd rather write slides in markdown than HTML, `slides-md/` ships a

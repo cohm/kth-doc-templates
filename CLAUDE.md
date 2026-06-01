@@ -200,10 +200,25 @@ Things to know before editing:
   and the four `--r-heading*-size` values in one place.
 
 - **Master chrome is injected per-section by JS** (see `injectMasterChrome`
-  in `example.html`), not via a single global overlay. This is essential
+  in `kth-reveal.js`), not via a single global overlay. This is essential
   for print-pdf mode, where reveal stacks every slide into one DOM —
   body-class-based chrome would only style the *current* slide and leave
   the rest unstyled in the exported PDF.
+
+- **2D layout / vertical stacks.** A top-level `<section>` that contains
+  child `<section>`s is a reveal *vertical stack* — a column container,
+  not a slide; reveal renders only its children. `injectMasterChrome`
+  therefore targets **leaf** sections (`.reveal .slides section` filtered
+  to those with no `:scope > section` child), walking one level into each
+  stack so nested slides get the same logo / footer / page number as
+  top-level ones. Page numbers are sequential `idx / total` over the leaf
+  set in DOM order (columns left-to-right, slides top-to-bottom). A flat
+  deck has no stacks, so the leaf set equals the old `.slides > section`
+  set and numbering is unchanged. `reveal/example.html` is authored as
+  one column per KTH section (divider + its content slides); cover and
+  closing are single-slide columns. Only the HTML deck uses stacks today —
+  `slides-md/` is still linear (the markdown plugin nests on `--` vs `---`
+  separators if you ever want to mirror it there).
 
 - **Print-PDF padding override.** Reveal's print stylesheet sets
   `padding: 0 !important; min-height: 1px;` on every section. Re-apply
