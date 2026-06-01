@@ -4,6 +4,7 @@
 *.log
 .DS_Store
 reveal/.DS_Store
+example-reveal.pdf
 
 # Transient: puppeteer installed by reveal/build-preview.mjs (CI + local dev)
 node_modules/

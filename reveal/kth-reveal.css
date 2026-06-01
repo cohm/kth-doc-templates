@@ -502,6 +502,26 @@ html:not(.reveal-print) .reveal {
   box-sizing: border-box;
 }
 
+/* A vertical stack (2D layout) — a column container, not a slide. Reveal
+   tags every section that contains child sections with the `.stack` class,
+   so we key on that rather than `:has(> section)`. The distinction matters
+   in print-pdf mode: reveal relocates each leaf slide into a `.pdf-page`
+   wrapper, emptying the stack — at which point `:has(> section)` would stop
+   matching and the now-childless stack would fall back to the content-slide
+   rule's `min-height: 1080px`, printing two blank black pages. The `.stack`
+   class survives that relocation, so this reset holds. Without it, the
+   stack's padding/min-height also compound with the nested leaf slide on
+   screen, shifting its content down and to the right.
+
+   `.stack` plus `:not([data-state])` on the print selector raises its
+   specificity above the print content rule below (which it would otherwise
+   tie and lose to on source order). On screen the `!important` settles it. */
+.reveal .slides section.stack,
+html.reveal-print .reveal .slides section.stack:not([data-state]) {
+  padding: 0 !important;
+  min-height: 0 !important;
+}
+
 /* Default flow style — used as-is on cover/divider where the eyebrow sits
    in the title block. On content slides we override below with absolute
    positioning so it tucks into the top-right corner. */
@@ -951,14 +971,17 @@ html:not(.reveal-print) .reveal {
 }
 
 /* Vertical-centre helper — fills the body content area of a content slide
-   (1080 - 200 padding-top - 100 padding-bottom = 780) and centres a single
-   child inside it. Used on the iframe-widget slide. */
+   (1080 - 240 padding-top - 100 padding-bottom = 740) and centres a single
+   child inside it. Used on the iframe-widget slide. Keep this in sync with
+   the content-slide padding above: if min-height exceeds the available body
+   height, the slide exceeds 1080 px and reveal's print-PDF spills it onto a
+   blank second page. */
 .reveal section .vcenter {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: stretch;
-  min-height: 780px;
+  min-height: 740px;
 }
 
 /* ------------------------------------------------------------------------- */
