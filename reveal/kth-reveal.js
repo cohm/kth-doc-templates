@@ -162,6 +162,46 @@
   }
 
   // --------------------------------------------------------------------- //
+  // Authoring check: content-slide titles must be <h1>                    //
+  //                                                                       //
+  // kth-reveal.css lifts a content slide's title out of the flow and into //
+  // the header band beside the logo, via                                  //
+  //   .reveal section:not([data-state]) > h1:first-of-type               //
+  // That selector matches h1 ONLY. Write the title as <h2> and it stays   //
+  // in normal flow *below* the logo, inside the 240px top padding —       //
+  // the slide still looks plausible, just misaligned and short of         //
+  // vertical space, so the mistake survives review. It has been made      //
+  // more than once.                                                       //
+  //                                                                       //
+  // We can't fix it in CSS by also matching h2: the heading-hierarchy     //
+  // demo slide in example.html has a deliberate direct-child <h2> in      //
+  // flow, and widening the selector would yank it into the header band.   //
+  // So warn instead, and only in the unambiguous case — a content slide   //
+  // with no direct-child h1 but some other direct-child heading, which is //
+  // almost certainly a title written at the wrong level. Slides with no   //
+  // heading at all (full-bleed figures) are left alone.                   //
+  // --------------------------------------------------------------------- //
+  function checkSlideTitles() {
+    // Enumerate the same leaf-slide set injectMasterChrome numbers, so the
+    // slide number in the warning matches the one printed in the footer.
+    const slides = [...document.querySelectorAll('.reveal .slides section')]
+      .filter((s) => !s.querySelector(':scope > section'));
+    slides.forEach((section, i) => {
+      if (section.dataset.state) return;            // cover/divider/closing
+      if (section.querySelector(':scope > h1')) return;
+      const stray = section.querySelector(':scope > h2, :scope > h3, :scope > h4');
+      if (!stray) return;
+      console.warn(
+        '[kth-reveal] Slide ' + (i + 1) + ' ("' +
+        (stray.textContent || '').trim().slice(0, 40) +
+        '") uses <' + stray.tagName.toLowerCase() + '> as its title. ' +
+        'Content-slide titles must be <h1> as a direct child of <section>, ' +
+        'or the theme cannot place them beside the logo.'
+      );
+    });
+  }
+
+  // --------------------------------------------------------------------- //
   // Reveal v5 does NOT mirror data-state to the generated .slide-         //
   // background div, so we sync that here for the per-variant background   //
   // colours defined in kth-reveal.css.                                    //
@@ -266,9 +306,11 @@
       document.querySelector('.reveal .slides > section[data-markdown]');
     if (hasMarkdownPlaceholder && typeof Reveal !== 'undefined') {
       Reveal.on('ready', injectMasterChrome);
+      Reveal.on('ready', checkSlideTitles);
       Reveal.on('ready', renderKatex);
     } else {
       injectMasterChrome();
+      checkSlideTitles();
       if (document.readyState === 'complete') renderKatex();
       else window.addEventListener('load', renderKatex);
     }
@@ -290,6 +332,7 @@
   // adding slides or swapping titles in at runtime.
   window.KthReveal = {
     injectMasterChrome,
+    checkSlideTitles,
     mirrorStateToBackgrounds,
     fitTitle,
     fitAllTitles,
