@@ -114,7 +114,16 @@ html:not(.reveal-print) .reveal {
   --r-heading-letter-spacing: normal;
   --r-heading-text-transform: none;
   --r-heading-text-shadow:    none;
-  --r-heading-font-weight:    700;
+  /* Heading weight. Two steps: titles (h1/h2, including the content-slide
+     title) and the display slides (cover / divider / closing), which sit one
+     step heavier because they are larger and, on the closing slide, reversed
+     out of KTH blue. Both were previously hard-coded — 700 and 800 — in five
+     separate rules, and this variable was declared but never referenced.
+     h3/h4 keep their own explicit weights below; they are smaller than a
+     title and carry hierarchy by size and colour, so they read as subheads
+     even though they are numerically heavier than h1. */
+  --r-heading-font-weight:         400;
+  --r-heading-display-font-weight: 500;
 
   --r-heading1-size:          92px;  /* slide title (h1) */
   --r-heading2-size:          60px;  /* section / panel (h2) */
@@ -138,7 +147,7 @@ html:not(.reveal-print) .reveal {
   color: var(--kth-navy);
   text-transform: none;
   letter-spacing: normal;
-  font-weight: 700;
+  font-weight: var(--r-heading-font-weight);
   margin: 0 0 0.4em 0;
   text-shadow: none;
   line-height: 1.12;
@@ -374,7 +383,7 @@ html:not(.reveal-print) .reveal {
 .reveal section[data-state="cover"] h1 {
   font-size: 116px;
   color: var(--kth-navy);
-  font-weight: 800;
+  font-weight: var(--r-heading-display-font-weight);
   letter-spacing: -0.01em;
   margin: 0 0 0.18em 0;
   line-height: 1.05;
@@ -441,7 +450,7 @@ html:not(.reveal-print) .reveal {
 .reveal section[data-state="divider"] h2 {
   color: var(--kth-navy);
   font-size: 96px;
-  font-weight: 800;
+  font-weight: var(--r-heading-display-font-weight);
   border: 0;
   padding: 0;
   margin: 0;
@@ -477,7 +486,7 @@ html:not(.reveal-print) .reveal {
 .reveal section[data-state="closing"] h2 {
   color: var(--kth-white);
   font-size: 96px;
-  font-weight: 800;
+  font-weight: var(--r-heading-display-font-weight);
   border: 0;
   padding: 0;
   margin: 0 0 0.2em 0;
@@ -579,7 +588,7 @@ html.reveal-print .reveal .slides section.stack:not([data-state]) {
 /* H1 used as slide title on content slides */
 .reveal section h1 {
   color: var(--kth-navy);
-  font-weight: 700;
+  font-weight: var(--r-heading-font-weight);
   margin: 0 0 0.5em 0;
 }
 

@@ -213,6 +213,19 @@ Things to know before editing:
   the solid `1`; such components should set `line-height: var(--r-main-line-height)`
   themselves.
 
+- **Heading weight comes in two steps, both variables.**
+  `--r-heading-font-weight` (default `400`) covers `h1`/`h2`, including the
+  content-slide title; `--r-heading-display-font-weight` (default `500`)
+  covers the display slides — cover `h1`, divider `h2`, closing `h2` — which
+  are larger and, on the closing slide, reversed out of KTH blue, so they
+  carry one step more. Both were previously hard-coded across five rules
+  (`700` and `800`) while `--r-heading-font-weight` sat declared and unused.
+  Note the weights are deliberately **not** a descending ramp: `h3` (`600`)
+  and `h4` (`500`) stay heavier than the title, because at 44/34px against a
+  92px title they read as labels within the content and are distinguished by
+  size and by being KTH blue rather than navy. Raise the display weight
+  towards `600` if a venue's projector thins the reversed-out closing title.
+
 - **Master chrome is injected per-section by JS** (see `injectMasterChrome`
   in `kth-reveal.js`), not via a single global overlay. This is essential
   for print-pdf mode, where reveal stacks every slide into one DOM —
