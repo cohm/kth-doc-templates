@@ -92,6 +92,13 @@ html:not(.reveal-print) .reveal {
   --r-main-font-size:     30px;
   --r-main-color:         var(--kth-brokenblack);
   --r-block-margin:       0.6em;
+  /* Body leading — applied on the body-text rule further down, not here.
+     reveal.css sets `.reveal .slides section { line-height: 1 }`, a unitless
+     ratio that inherits to every descendant, so without an override body
+     text renders solid (leading exactly equal to the font size). Override
+     per deck for an airier or denser measure; 1.25 is about as tight as
+     stays readable at 30px. */
+  --r-main-line-height:   1.45;
 
   /* Reveal v5 only applies these variables under @media print — its base
      stylesheet doesn't actually use them in screen mode, so we have to
@@ -142,8 +149,15 @@ html:not(.reveal-print) .reveal {
 .reveal h3 { font-size: var(--r-heading3-size); color: var(--kth-blue); font-weight: 600; }
 .reveal h4 { font-size: var(--r-heading4-size); color: var(--kth-blue); font-weight: 500; }
 
+/* Body text. The line-height here is what stops reveal's inherited
+   `line-height: 1` (set on .slides section) from rendering every paragraph
+   and list item solid. Components that need their own measure — .big-stat,
+   .subtitle, .lead — set it explicitly and are unaffected. Text placed in
+   bare <div>s by a deck (custom grids, key/value tables) still inherits the
+   solid 1 and should set its own leading, ideally from the same variable. */
 .reveal p, .reveal li, .reveal blockquote, .reveal td {
   font-family: var(--body-font);
+  line-height: var(--r-main-line-height);
 }
 
 .reveal p { margin: 0 0 0.6em; }

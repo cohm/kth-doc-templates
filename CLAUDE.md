@@ -199,6 +199,20 @@ Things to know before editing:
   document-scale. To resize the whole deck, change `--r-main-font-size`
   and the four `--r-heading*-size` values in one place.
 
+- **Body leading is an override, and has to be.** reveal.css sets
+  `.reveal .slides section { line-height: 1 }`. That's a *unitless* ratio,
+  so it inherits into every descendant and each one recomputes it against
+  its own font size — meaning body text renders **solid** (leading exactly
+  equal to the font size) unless something overrides it. `--r-main-line-height`
+  (default `1.45`) is applied on the `.reveal p, li, blockquote, td` rule for
+  exactly this reason; setting it on `.reveal` alone would not work, because
+  the `.slides section` rule is more specific. Headings carry their own
+  `1.12`, and components with a deliberate measure (`.big-stat`, `.subtitle`,
+  `.lead`) set theirs explicitly, so none of them are affected. **Text a deck
+  puts in bare `<div>`s** — custom grids, key/value tables — still inherits
+  the solid `1`; such components should set `line-height: var(--r-main-line-height)`
+  themselves.
+
 - **Master chrome is injected per-section by JS** (see `injectMasterChrome`
   in `kth-reveal.js`), not via a single global overlay. This is essential
   for print-pdf mode, where reveal stacks every slide into one DOM —
