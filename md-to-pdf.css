@@ -199,12 +199,18 @@ pre {
   background: var(--kth-sand);
   border-left: 2pt solid var(--kth-blue);
   padding: 0.6em 0.9em;
-  overflow-x: auto;
   line-height: 1.4;
+  /* A PDF has no scrollbar: `overflow-x: auto` here used to CLIP long lines
+     silently. Wrap instead — at spaces first, mid-token only when one token
+     is wider than the block (long strings, URLs, paths). Not `@media print`:
+     md-to-pdf renders with page_media_type 'screen', so that never matches. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 pre > code {
   background: transparent;
   padding: 0;
+  white-space: inherit;
 }
 
 /* ------------------------------------------------------------------------- */
