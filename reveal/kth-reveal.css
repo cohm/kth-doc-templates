@@ -171,6 +171,18 @@ html:not(.reveal-print) .reveal {
 
 .reveal p { margin: 0 0 0.6em; }
 
+/* Inline semantics. reveal's reset.css gives b/strong/em/i/sup/sub
+   `font: inherit` and `vertical-align: baseline`, and reveal's stock themes
+   put the styling back — this file replaces the theme, so it has to as well.
+   Without these, **bold** and *italic* render as plain body text and
+   10<sup>9</sup> reads as "109". (Inline <code> is restored further down,
+   under Code blocks.) line-height: 0 on sup/sub keeps the raised
+   glyphs from pushing the line box open. */
+.reveal strong, .reveal b { font-weight: 700; }
+.reveal em, .reveal i     { font-style: italic; }
+.reveal sup { vertical-align: super; font-size: 0.7em; line-height: 0; }
+.reveal sub { vertical-align: sub;   font-size: 0.7em; line-height: 0; }
+
 /* Hanging-indent lists: the marker sits in the ul's left-gutter (the
    ul's padding-left), the first line of text starts where the gutter
    ends, and wrapped lines align with that same x — so the bullet
