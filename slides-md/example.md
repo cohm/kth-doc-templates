@@ -210,9 +210,11 @@ All sizes scale from `--r-main-font-size: 30px`. Headings and body both use <spa
 </div>
 <div>
 
-### Inline highlight
+### Inline styles
 
 Use <span class="kthhl">.kthhl</span> for keywords in bold KTH&nbsp;blue.
+
+Plain text also does **bold**, *italics*, 10<sup>9</sup> and H<sub>2</sub>O.
 
 ### Lists
 
