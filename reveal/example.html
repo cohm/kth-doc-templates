@@ -502,7 +502,10 @@ print(measure().mean(), KTH_BLUE)
     transitionSpeed: 'default',
     backgroundTransition: 'fade',
 
-    pdfSeparateFragments: false,
+    // ?print-pdf: one page per slide, all fragments shown.
+    // ?print-pdf&steps: one page per fragment step.
+    pdfSeparateFragments: /[?&]steps\b/.test(location.search),
+    pdfMaxPagesPerSlide: 1,
 
     plugins: [ RevealHighlight, RevealNotes ],
   });

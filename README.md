@@ -99,6 +99,12 @@ the deck as PDF, append `?print-pdf` to the URL and use the browser's "Save
 as PDF" with paper size 1920×1080, no margins, and "Background graphics"
 turned on.
 
+`?print-pdf` gives one page per slide with every fragment shown;
+`?print-pdf&steps` gives one page per fragment step (a handout that follows
+the clicks). Each slide prints on exactly one page: content that overflows
+the 1920×1080 slide is clipped, as it would be on the projector, instead of
+spilling onto an extra page.
+
 **Use Chrome on macOS for PDF export.** Other browsers have rough
 edges that make 1920×1080 awkward:
 

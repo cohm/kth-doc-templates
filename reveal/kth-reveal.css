@@ -1059,3 +1059,32 @@ html.reveal-print .reveal .slides section:not([data-state]) {
   min-height: 1080px !important;
   box-sizing: border-box !important;
 }
+
+/* ------------------------------------------------------------------------- */
+/* Print-PDF: exactly one sheet per slide                                     */
+/*                                                                            */
+/* - Reveal sizes each .pdf-page at 1079 px (rounding), so pages drift        */
+/*   against the 1080 px sheets; an image that ends up across a sheet         */
+/*   boundary is moved whole to the next sheet. Pin pages to 1080.            */
+/* - A section even a few px taller than 1080 (content reaching the footer    */
+/*   plus the bottom padding above) is split over two sheets, and what lies   */
+/*   past the split is lost. Fix every section at exactly 1080.               */
+/* - Transitions off, so print measures and paints the final state.           */
+/* - Background colours: mirrorStateToBackgrounds() does not reach the        */
+/*   backgrounds of the print layout, so cover/divider/closing printed on the */
+/*   default fill (white logo on white for the closing slide). Colour each    */
+/*   page from the state of the section it holds.                             */
+/* ------------------------------------------------------------------------- */
+html.reveal-print .reveal .pdf-page { height: 1080px !important; overflow: hidden !important; }
+html.reveal-print .reveal .slides .pdf-page > section {
+  height: 1080px !important; max-height: 1080px !important; overflow: hidden !important;
+}
+html.reveal-print .reveal *,
+html.reveal-print .reveal *::before,
+html.reveal-print .reveal *::after { transition: none !important; animation: none !important; }
+html.reveal-print .reveal .pdf-page:has(> section[data-state~="cover"]),
+html.reveal-print .reveal .pdf-page:has(> section[data-state~="cover"]) .slide-background { background: var(--kth-lightblue) !important; }
+html.reveal-print .reveal .pdf-page:has(> section[data-state~="divider"]),
+html.reveal-print .reveal .pdf-page:has(> section[data-state~="divider"]) .slide-background { background: var(--kth-sand) !important; }
+html.reveal-print .reveal .pdf-page:has(> section[data-state~="closing"]),
+html.reveal-print .reveal .pdf-page:has(> section[data-state~="closing"]) .slide-background { background: var(--kth-blue) !important; }
