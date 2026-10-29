@@ -119,10 +119,14 @@
       //
       // Stroke colour from data-pattern-color (skyblue|blue|navy|lightblue
       // |sand|white|digitalblue), defaulting to skyblue and shared by all
-      // instances on the section.
+      // instances on the section. Any other value also falls back to
+      // skyblue: the colour is spliced into markup below, so it must come
+      // from the list, never from the attribute as written.
       if (section.hasAttribute('data-pattern')) {
         const spec   = (section.getAttribute('data-pattern') || '').toLowerCase().trim();
-        const colour = (section.dataset.patternColor || 'skyblue').toLowerCase();
+        const COLOURS = ['skyblue', 'blue', 'navy', 'lightblue', 'sand', 'white', 'digitalblue'];
+        const wanted  = (section.dataset.patternColor || 'skyblue').toLowerCase();
+        const colour  = COLOURS.includes(wanted) ? wanted : 'skyblue';
         const SOURCES = ['tl', 'tr', 'bl', 'br', 'full'];
         const XFORMS  = ['rotate-180', 'mirror-x', 'mirror-y'];
         const items = spec ? spec.split(',').map(s => s.trim()).filter(Boolean) : ['full'];
@@ -133,8 +137,11 @@
           for (const t of tokens) {
             if (XFORMS.includes(t)) cls.push(t);
           }
+          // Every piece of this string comes from a fixed list (COLOURS,
+          // SOURCES, XFORMS) or the constant path table, so no attribute value
+          // reaches the markup as written.
           section.insertAdjacentHTML('afterbegin',
-            '<div class="' + cls.join(' ') + '">' + kthPatternSvg(source) + '</div>');
+            '<div class="' + cls.join(' ') + '">' + kthPatternSvg(source) + '</div>'); // nosemgrep: typescript.react.security.audit.react-unsanitized-method.react-unsanitized-method
         }
       }
 
@@ -150,13 +157,23 @@
         section.insertAdjacentHTML('afterbegin',
           '<img class="kth-page-logo" src="KTH_logo_RGB_bla.svg" alt="KTH">');
       } else {
+        // The footer carries the deck author's name, which is free text from
+        // data-kth-author: set it as text, not markup, so a name with "&" or
+        // "<" renders as written instead of being parsed as HTML.
+        const footer = document.createElement('div');
+        footer.className = 'kth-page-footer';
+        for (const [cls, text] of [['left', namePlusAff],
+                                   ['center', idx + ' / ' + total],
+                                   ['right', '']]) {
+          const span = document.createElement('span');
+          span.className = cls;
+          span.textContent = text;
+          footer.appendChild(span);
+        }
+        // Same resulting order as before: logo first, then footer.
+        section.prepend(footer);
         section.insertAdjacentHTML('afterbegin',
-          '<img class="kth-page-logo" src="KTH_logo_RGB_bla.svg" alt="KTH">' +
-          '<div class="kth-page-footer">' +
-            '<span class="left">'  + namePlusAff + '</span>' +
-            '<span class="center">' + idx + ' / ' + total + '</span>' +
-            '<span class="right"></span>' +
-          '</div>');
+          '<img class="kth-page-logo" src="KTH_logo_RGB_bla.svg" alt="KTH">');
       }
     });
   }
