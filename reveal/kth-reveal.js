@@ -294,15 +294,22 @@
   // still in the DOM, so they get processed too). No-op if the consumer  //
   // didn't include the KaTeX <link>/<script> in their <head>.            //
   // --------------------------------------------------------------------- //
+  // Speaker notes get MathML only: the notes plugin copies their HTML    //
+  // into the speaker window, which has no KaTeX CSS, so the default      //
+  // HTML+MathML output would show every formula twice there. Browsers   //
+  // render MathML natively.                                               //
   function renderKatex() {
     if (typeof renderMathInElement !== 'function') return;
-    renderMathInElement(document.body, {
+    const opts = {
       delimiters: [
         { left: '$$', right: '$$', display: true  },
         { left: '$',  right: '$',  display: false },
       ],
       throwOnError: false,
-    });
+    };
+    renderMathInElement(document.body, { ...opts, ignoredClasses: ['notes'] });
+    document.querySelectorAll('aside.notes').forEach(n =>
+      renderMathInElement(n, { ...opts, output: 'mathml' }));
   }
 
   // --------------------------------------------------------------------- //
