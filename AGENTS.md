@@ -92,6 +92,16 @@ non-obvious things to know before editing:
   All three branches define `\sfheading` so the rest of the class is
   engine-agnostic.
 
+- **OpenType math under xelatex/lualatex.** Those branches load amsmath,
+  amssymb and unicode-math with `latinmodern-math.otf` (by file name, so
+  XeLaTeX finds it in TeX Live). Computer Modern Type 1 math printed wrongly
+  on some printers (comma → semicolon, minus and \cdot missing). amssymb
+  must precede unicode-math, which is why the class loads it. With the
+  `swedish` option a `begindocument/end` hook repoints icomma's
+  `\mathcomma` to the Latin Modern comma; without it, commas in subscripts
+  like `$E_{p,0}$` stop compilation. With unicode-math, a command used as an
+  unbraced subscript (`\int_\mathbb{R}`) must be braced (`\int_{\mathbb{R}}`).
+
 - **Proportional heading sizes.** All title and section sizes are stored as
   `\dimen` registers (`\kth@secsize`, `\kth@titlesize`, …) computed from
   `\f@size` in `\AtBeginDocument`. They scale automatically with the `10pt` /

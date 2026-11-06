@@ -13,9 +13,11 @@
 %% Compile with: pdflatex (recommended) or xelatex/lualatex
 %% For exact KTH fonts (Figtree), compile with xelatex or lualatex
 %% and ensure Figtree is installed (available free on Google Fonts).
+%% xelatex/lualatex also set math in Latin Modern Math (OpenType), which
+%% prints reliably; pdflatex keeps the Computer Modern Type 1 fonts.
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{kth-document}[2026/04/18 v1.0 KTH Professional Document]
+\ProvidesClass{kth-document}[2026/11/06 v1.1 KTH Professional Document]
 
 % --------------------------------------------------------------------------
 % Options
@@ -107,6 +109,34 @@
   \RequirePackage{microtype}
   \newcommand{\sfheading}{\sffamily}
 \fi\fi
+
+% --------------------------------------------------------------------------
+% Math fonts (xelatex/lualatex)
+% --------------------------------------------------------------------------
+% Without this, math is set in Computer Modern Type 1 fonts with built-in
+% encodings. Some print paths ignore those encodings and substitute the
+% glyphs: commas print as semicolons, minus, \cdot, \approx and \pi vanish,
+% and superscript digits come out in Courier. Latin Modern Math looks the
+% same but is OpenType and is embedded with a Unicode map. It is loaded by
+% file name so that XeLaTeX finds it in TeX Live as well.
+%
+% amsmath and amssymb must come before unicode-math (amssymb after it fails
+% with "Command already defined"), so the class loads them here; a later
+% \usepackage{amsmath,amssymb} in the document is then a no-op.
+%
+% icomma (swedish option) stores the comma's mathcode at \begin{document},
+% before unicode-math has set it, and then fails on commas in subscripts
+% such as $E_{p,0}$. At the very end of \begin{document} we point
+% \mathcomma at the Latin Modern Math comma (class 6 = punctuation,
+% family 0, U+002C) and make the comma math-active again.
+\ifPDFTeX\else
+  \RequirePackage{amsmath,amssymb}
+  \RequirePackage{unicode-math}
+  \setmathfont{latinmodern-math.otf}
+  \if@kthswedish
+    \AddToHook{begindocument/end}{\Umathchardef\mathcomma="6 0 "2C \mathcode`\,="8000 }
+  \fi
+\fi
 
 % --------------------------------------------------------------------------
 % Colors  (KTH Grafisk manual v1.2, 2024)
